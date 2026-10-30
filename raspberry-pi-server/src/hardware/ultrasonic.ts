@@ -26,14 +26,14 @@ export async function readUltrasonic(): Promise<UltrasonicReading> {
         __dirname,
         "../../scripts/read_ultrasonic.py"
       );
-      const { stdout } = await execFileAsync(
+      const { stdout, stderr } = await execFileAsync(
         "python3",
         [
           scriptPath,
           String(CONFIG.ultrasonicTrigPin),
           String(CONFIG.ultrasonicEchoPin),
         ],
-        { timeout: 2000 }
+        { timeout: 3000 }
       );
       const parsed = JSON.parse(stdout.trim());
       if (parsed.ok && typeof parsed.distance_cm === "number") {
@@ -41,11 +41,17 @@ export async function readUltrasonic(): Promise<UltrasonicReading> {
           distanceCm: parsed.distance_cm,
           simulated: false,
         };
+      } else if (parsed.error) {
+        console.warn(
+          `[Ultrasonic] Sensor read warning on TRIG=GPIO${CONFIG.ultrasonicTrigPin}, ECHO=GPIO${CONFIG.ultrasonicEchoPin}:`,
+          parsed.error,
+          parsed.hint ? `| Hint: ${parsed.hint}` : ""
+        );
       }
     } catch (err) {
       console.warn(
         `[Ultrasonic] Hardware read failed on TRIG=GPIO${CONFIG.ultrasonicTrigPin}, ECHO=GPIO${CONFIG.ultrasonicEchoPin}, using simulated fallback:`,
-        (err as Error).message
+        (err as any).stderr || (err as Error).message
       );
     }
   }

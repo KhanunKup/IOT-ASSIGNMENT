@@ -18,7 +18,11 @@ function decodeUplink(input) {
   }
 
   var lightRaw = (bytes[0] << 8) | bytes[1];
-  var lightPercent = Number(((lightRaw / 1023.0) * 100.0).toFixed(1));
+  // โมดูล LM393 LDR: ค่า ADC ยิ่งน้อย = แสงสว่างมาก (แปลงเป็น % ความสว่าง 0 - 100%)
+  var lightPercent = Number((((1023.0 - lightRaw) / 1023.0) * 100.0).toFixed(1));
+  if (lightPercent < 0) lightPercent = 0;
+  if (lightPercent > 100) lightPercent = 100;
+
   var lightDigital = bytes[2] === 1;
   var ledState = (bytes.length >= 4 && bytes[3] === 1) ? "ON" : "OFF";
 

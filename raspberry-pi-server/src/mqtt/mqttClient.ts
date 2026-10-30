@@ -22,8 +22,9 @@ export function decodeLoRaBinaryPayload(base64Data: string): {
     if (buf.length < 3) return null;
 
     const lightRaw = (buf[0] << 8) | buf[1];
+    // โมดูล LM393 LDR: ค่า ADC ยิ่งน้อย = แสงยิ่งสว่าง (แปลงเป็น % ความสว่าง 0 - 100%)
     const lightPercent = Number(
-      Math.min(100, Math.max(0, (lightRaw / 1023) * 100)).toFixed(1)
+      Math.min(100, Math.max(0, ((1023 - lightRaw) / 1023) * 100)).toFixed(1)
     );
     const lightDigital = buf[2] === 1;
     const ledState: "ON" | "OFF" = buf.length >= 4 && buf[3] === 1 ? "ON" : "OFF";
@@ -134,7 +135,9 @@ export function initMqttClient(): void {
           if (typeof obj.light_percent === "number")
             lightPercent = obj.light_percent;
           else if (typeof lightRaw === "number")
-            lightPercent = Number(((lightRaw / 1023) * 100).toFixed(1));
+            lightPercent = Number(
+              (((1023 - lightRaw) / 1023) * 100).toFixed(1)
+            );
 
           if (typeof obj.light_digital === "boolean")
             lightDigital = obj.light_digital;
