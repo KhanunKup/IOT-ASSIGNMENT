@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT MCP Dashboard — Raspberry Pi 4 & Arduino R4 LoRa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', 'Sarabun', system-ui, -apple-system, sans-serif;
+    }
+    .toggle-checkbox:checked {
+      right: 0;
+      border-color: #10b981;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #10b981;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <!-- Top Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold">
+            IoT
+          </span>
+          <div>
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">
+              ระบบ IoT ควบคุม/อ่านค่า ผ่าน AI Chat box (MCP Server & Web Dashboard)
+            </h1>
+            <p class="text-xs text-slate-400">
+              Raspberry Pi 4 (SHT31 + HC-SR04 + LED) &bull; Arduino UNO R4 LoRa Shield (LDR + Infrared + LED) &bull; ChirpStack (<span class="text-sky-400">lora.kmitl.ac.th</span>)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs">
+        <span id="mqttBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          MQTT: Checking...
+        </span>
+        <span id="hwModeBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+          Mode: Loading...
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <!-- Top Grid: Raspberry Pi Local Devices vs Arduino R4 LoRa Node -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- 1. Raspberry Pi 4 Local Sensors & Control (Block 3) -->
+      <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Block 3 &bull; Local Devices</span>
+            <h2 class="text-base font-bold text-white mt-0.5">Raspberry Pi 4 Sensors & Actuator</h2>
+          </div>
+          <span class="text-xs text-slate-400 font-mono" id="piUpdatedAt">--:--:--</span>
+        </div>
+
+        <!-- 3 Sensor Metric Cards matching Block 7 diagram -->
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <!-- SHT31 Temperature -->
+          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Temperature</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300">SHT31 I2C</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span id="piTemp">26.5</span> <span class="text-sm font-normal text-slate-400">°C</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">Pin 3 (GPIO2) / Pin 5 (GPIO3)</div>
+          </div>
+
+          <!-- SHT31 Humidity -->
+          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Humidity</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-sky-300">0x44</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span id="piHum">62.0</span> <span class="text-sm font-normal text-slate-400">%</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">pi/sensor/humidity</div>
+          </div>
+
+          <!-- Ultrasonic Distance -->
+          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Distance</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-purple-300">HC-SR04</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span id="piDist">120</span> <span class="text-sm font-normal text-slate-400">cm</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">TRIG: GPIO23 / ECHO: GPIO24</div>
+          </div>
+        </div>
+
+        <!-- Raspberry Pi LED Control Bar -->
+        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div id="piLedIndicator" class="w-4 h-4 rounded-full bg-slate-600 transition-all duration-300"></div>
+            <div>
+              <div class="text-sm font-semibold text-white">
+                Raspberry Pi LED: <span id="piLedText" class="text-slate-400">OFF</span>
+              </div>
+              <div class="text-xs text-slate-400 font-mono">
+                Port: GPIO 17 (Physical Pin 11) &bull; Topic: <span class="text-emerald-400">pi/device/led</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="controlPiLed('ON')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition">
+              เปิดไฟ (ON)
+            </button>
+            <button onclick="controlPiLed('OFF')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+              ปิดไฟ (OFF)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Arduino UNO R4 + LoRa Shield (Block 5 & 6) -->
+      <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-sky-400">Block 5 & 6 &bull; LoRaWAN Network (ChirpStack)</span>
+            <h2 class="text-base font-bold text-white mt-0.5">Arduino UNO R4 + LoRa SX1276/RFM95 Shield</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="simulateLoRaUplink()" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 transition" title="จำลองการส่งค่าจาก LoRa Node เข้า MQTT">
+              + จำลอง Uplink
+            </button>
+            <span class="text-xs text-slate-400 font-mono" id="loraUpdatedAt">--:--:--</span>
+          </div>
+        </div>
+
+        <!-- LoRa Sensor Metric Cards -->
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <!-- Light Sensor (LDR A0) -->
+          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Light (วัดแสง)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300">Pin A0</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span id="loraLightPercent">66.5</span> <span class="text-sm font-normal text-slate-400">%</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">Raw ADC: <span id="loraLightRaw">680</span> / 1023</div>
+          </div>
+
+          <!-- Infrared Sensor (Digital D3) -->
+          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Infrared (IR)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-rose-300">Pin D3</span>
+            </div>
+            <div class="mt-1">
+              <span id="loraIrBadge" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                ปกติ (Clear)
+              </span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-2 font-mono">Obstacle Detection</div>
+          </div>
+
+          <!-- LoRa Signal RSSI / SNR -->
+          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>LoRa RF Signal</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-sky-300">SX1276</span>
+            </div>
+            <div class="text-lg font-bold text-white tracking-tight">
+              <span id="loraRssi">-78</span> <span class="text-xs font-normal text-slate-400">dBm</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">SNR: <span id="loraSnr">9.5</span> dB &bull; lora/node1/data</div>
+          </div>
+        </div>
+
+        <!-- LoRa Node LED Control (ChirpStack Downlink) -->
+        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div id="loraLedIndicator" class="w-4 h-4 rounded-full bg-slate-600 transition-all duration-300"></div>
+            <div>
+              <div class="text-sm font-semibold text-white">
+                LoRa Node LED (Downlink): <span id="loraLedText" class="text-slate-400">OFF</span>
+              </div>
+              <div class="text-xs text-slate-400 font-mono">
+                Port: Arduino R4 Pin D4 &bull; Topic: <span class="text-sky-400">lora/node1/control</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="controlLoRaLed('ON')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition">
+              เปิดไฟ (ON)
+            </button>
+            <button onclick="controlLoRaLed('OFF')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+              ปิดไฟ (OFF)
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Live Data Chart Section (Block 7) -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-purple-400">Block 7 &bull; Live Data Visualization</span>
+          <h2 class="text-base font-bold text-white">กราฟแสดงผลข้อมูลเซนเซอร์แบบ Real-Time (REST API Polling)</h2>
+        </div>
+        <span class="text-xs text-slate-400 font-mono">GET /api/status &amp; GET /api/history</span>
+      </div>
+      <div class="h-72 w-full">
+        <canvas id="liveChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Pin Mapping & MCP Server Reference Table -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          ตารางสรุปพอร์ตและขาเชื่อมต่อฮาร์ดแวร์ (Pin &amp; Port Mapping)
+        </h3>
+        <div class="overflow-x-auto text-xs">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400">
+                <th class="py-2 pr-3">บอร์ด</th>
+                <th class="py-2 pr-3">อุปกรณ์ / เซนเซอร์</th>
+                <th class="py-2 pr-3">พอร์ต / ขา Pin ที่ใช้</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/70 font-mono text-slate-200">
+              <tr>
+                <td class="py-2 pr-3 text-emerald-400">Raspberry Pi 4</td>
+                <td class="py-2 pr-3">SHT31 (Temp &amp; Humidity)</td>
+                <td class="py-2 pr-3">I2C1: SDA=GPIO2 (Pin 3), SCL=GPIO3 (Pin 5), 0x44</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-emerald-400">Raspberry Pi 4</td>
+                <td class="py-2 pr-3">Ultrasonic HC-SR04</td>
+                <td class="py-2 pr-3">TRIG=GPIO23 (Pin 16), ECHO=GPIO24 (Pin 18)</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-emerald-400">Raspberry Pi 4</td>
+                <td class="py-2 pr-3">LED (Control Output)</td>
+                <td class="py-2 pr-3">GPIO17 (Physical Pin 11) + GND (Pin 9)</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
+                <td class="py-2 pr-3">LoRa Shield SX1276</td>
+                <td class="py-2 pr-3">NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11-D13</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
+                <td class="py-2 pr-3">Light Sensor (LDR)</td>
+                <td class="py-2 pr-3">Analog Pin A0 (VCC=5V, GND)</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
+                <td class="py-2 pr-3">Infrared Obstacle Sensor</td>
+                <td class="py-2 pr-3">Digital Pin D3 (VCC=5V, GND)</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
+                <td class="py-2 pr-3">LoRa Node LED (Downlink)</td>
+                <td class="py-2 pr-3">Digital Pin D4 (ผ่านตัวต้านทาน 220Ω ลง GND)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          ข้อมูลการเชื่อมต่อ AI Chat box เข้ากับ MCP Server (Block 1 &amp; 2)
+        </h3>
+        <div class="space-y-2.5 text-xs text-slate-300">
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
+            <div class="text-slate-400 mb-1">MCP Endpoints บน Raspberry Pi (Port 3000):</div>
+            <div class="font-mono text-emerald-400">SSE URL: <span id="mcpSseUrl">http://localhost:3000/sse</span></div>
+            <div class="font-mono text-sky-400 mt-0.5">HTTP JSON-RPC URL: <span id="mcpHttpUrl">http://localhost:3000/mcp</span></div>
+          </div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
+            <div class="text-slate-400 mb-1">4 MCP Tools ที่พร้อมให้ AI Chat box เรียกใช้งาน:</div>
+            <ul class="space-y-1 font-mono text-[11px] text-slate-200">
+              <li>1. <span class="text-emerald-300">read_pi_sensors</span> — อ่านค่า SHT31, Ultrasonic HC-SR04, และสถานะ LED</li>
+              <li>2. <span class="text-emerald-300">control_pi_devices</span> — สั่งเปิด/ปิดไฟ LED บน Raspberry Pi (GPIO 17)</li>
+              <li>3. <span class="text-sky-300">read_from_mqtt</span> — อ่านค่าแสง (LDR A0) และ Infrared (D3) จาก LoRa Node</li>
+              <li>4. <span class="text-sky-300">publish_to_mqtt</span> — ส่งคำสั่งเปิด/ปิดไฟไปที่ LoRa Node (Pin D4) หรือ MQTT</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Update displayed MCP URLs with current host
+    document.getElementById('mcpSseUrl').textContent = `${window.location.origin}/sse`;
+    document.getElementById('mcpHttpUrl').textContent = `${window.location.origin}/mcp`;
+
+    // Initialize Chart.js
+    const ctx = document.getElementById('liveChart').getContext('2d');
+    const liveChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Pi Temp (°C - SHT31)',
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            data: [],
+            tension: 0.3,
+            borderWidth: 2
+          },
+          {
+            label: 'Pi Humidity (% - SHT31)',
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            data: [],
+            tension: 0.3,
+            borderWidth: 2
+          },
+          {
+            label: 'Pi Distance (cm - Ultrasonic)',
+            borderColor: '#a855f7',
+            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            data: [],
+            tension: 0.3,
+            borderWidth: 2
+          },
+          {
+            label: 'LoRa Light (% - LDR A0)',
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            data: [],
+            tension: 0.3,
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+        },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#1e293b' } },
+          y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+        }
+      }
+    });
+
+    async function fetchStatusAndHistory() {
+      try {
+        const [statusRes, historyRes] = await Promise.all([
+          fetch('/api/status'),
+          fetch('/api/history')
+        ]);
+        const status = await statusRes.json();
+        const historyData = await historyRes.json();
+
+        if (status.ok) {
+          // Update MQTT Badge
+          const mqttBadge = document.getElementById('mqttBadge');
+          if (status.mqtt.connected) {
+            mqttBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+            mqttBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> MQTT: Connected (${status.mqtt.brokerUrl})`;
+          } else {
+            mqttBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30';
+            mqttBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> MQTT: Offline / Reconnecting (${status.mqtt.brokerUrl})`;
+          }
+
+          // Update Hardware Mode Badge
+          const hwBadge = document.getElementById('hwModeBadge');
+          hwBadge.textContent = status.pi.simulated ? 'Mode: Simulation (Ready)' : 'Mode: Raspberry Pi Hardware (I2C/GPIO)';
+
+          // Update Raspberry Pi Readings
+          document.getElementById('piTemp').textContent = status.pi.temperature.toFixed(1);
+          document.getElementById('piHum').textContent = status.pi.humidity.toFixed(1);
+          document.getElementById('piDist').textContent = status.pi.distanceCm.toFixed(1);
+          document.getElementById('piUpdatedAt').textContent = new Date(status.pi.updatedAt).toLocaleTimeString('th-TH');
+
+          // Update Pi LED Indicator
+          const piLedOn = status.pi.ledState === 'ON';
+          document.getElementById('piLedText').textContent = status.pi.ledState;
+          document.getElementById('piLedText').className = piLedOn ? 'text-emerald-400 font-bold' : 'text-slate-400';
+          document.getElementById('piLedIndicator').className = piLedOn
+            ? 'w-4 h-4 rounded-full bg-emerald-400 shadow-[0_0_12px_#10b981]'
+            : 'w-4 h-4 rounded-full bg-slate-600';
+
+          // Update LoRa Node Readings
+          document.getElementById('loraLightPercent').textContent = status.loraNode1.lightPercent.toFixed(1);
+          document.getElementById('loraLightRaw').textContent = status.loraNode1.lightRaw;
+          document.getElementById('loraRssi').textContent = status.loraNode1.rssi ?? '-78';
+          document.getElementById('loraSnr').textContent = status.loraNode1.snr ?? '9.5';
+          document.getElementById('loraUpdatedAt').textContent = new Date(status.loraNode1.updatedAt).toLocaleTimeString('th-TH');
+
+          const irBadge = document.getElementById('loraIrBadge');
+          if (status.loraNode1.infraredDetected) {
+            irBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+            irBadge.textContent = 'ตรวจพบวัตถุ! (Obstacle)';
+          } else {
+            irBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+            irBadge.textContent = 'ปกติ (Clear)';
+          }
+
+          // Update LoRa LED Indicator
+          const loraLedOn = status.loraNode1.ledState === 'ON';
+          document.getElementById('loraLedText').textContent = status.loraNode1.ledState;
+          document.getElementById('loraLedText').className = loraLedOn ? 'text-sky-400 font-bold' : 'text-slate-400';
+          document.getElementById('loraLedIndicator').className = loraLedOn
+            ? 'w-4 h-4 rounded-full bg-sky-400 shadow-[0_0_12px_#38bdf8]'
+            : 'w-4 h-4 rounded-full bg-slate-600';
+        }
+
+        if (historyData.ok && Array.isArray(historyData.history)) {
+          const pts = historyData.history;
+          liveChart.data.labels = pts.map(p => new Date(p.timestamp).toLocaleTimeString('th-TH'));
+          liveChart.data.datasets[0].data = pts.map(p => p.piTemperature);
+          liveChart.data.datasets[1].data = pts.map(p => p.piHumidity);
+          liveChart.data.datasets[2].data = pts.map(p => p.piDistanceCm);
+          liveChart.data.datasets[3].data = pts.map(p => p.loraLightPercent);
+          liveChart.update('none');
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard status:', err);
+      }
+    }
+
+    async function controlPiLed(action) {
+      await fetch('/api/pi/led', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+      await fetchStatusAndHistory();
+    }
+
+    async function controlLoRaLed(action) {
+      await fetch('/api/lora/led', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+      await fetchStatusAndHistory();
+    }
+
+    async function simulateLoRaUplink() {
+      await fetch('/api/simulate/lora', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      await fetchStatusAndHistory();
+    }
+
+    fetchStatusAndHistory();
+    setInterval(fetchStatusAndHistory, 3000);
+  </script>
+</body>
+</html>
+
