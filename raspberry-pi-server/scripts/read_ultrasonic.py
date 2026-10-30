@@ -64,4 +64,3 @@ if __name__ == "__main__":
     except Exception as exc:
         print(json.dumps({"ok": False, "error": str(exc)}))
         sys.exit(1)
-

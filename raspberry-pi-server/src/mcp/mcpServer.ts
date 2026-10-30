@@ -246,6 +246,10 @@ export async function executeMcpTool(
             deviceName: systemState.loraNode1.deviceName,
             light_raw_a0: systemState.loraNode1.lightRaw,
             light_percent: systemState.loraNode1.lightPercent,
+            light_digital_d5: systemState.loraNode1.lightDigital,
+            light_status: systemState.loraNode1.lightDigital
+              ? "สว่างเกินเกณฑ์ Trimpot (Bright)"
+              : "มืดกว่าเกณฑ์ Trimpot (Dark)",
             infrared_obstacle_detected_d3:
               systemState.loraNode1.infraredDetected,
             infrared_status_text: systemState.loraNode1.infraredDetected
@@ -258,7 +262,7 @@ export async function executeMcpTool(
           },
           ports: {
             lora_shield: "NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11/D12/D13",
-            light_sensor_ldr: "Analog Pin A0",
+            light_sensor_ldr: "LM393 4-Pin Module: AO=Pin A0, DO=Pin D5, GND=GND, VCC=5V",
             infrared_sensor: "Digital Pin D3",
             lora_node_led: "Digital Pin D4",
           },
@@ -286,6 +290,7 @@ export async function executeMcpTool(
           [CONFIG.topics.loraNode1Data]: {
             light_raw: systemState.loraNode1.lightRaw,
             light_percent: `${systemState.loraNode1.lightPercent}%`,
+            light_digital: systemState.loraNode1.lightDigital,
             infrared_detected: systemState.loraNode1.infraredDetected,
             led_state: systemState.loraNode1.ledState,
             rssi: systemState.loraNode1.rssi,

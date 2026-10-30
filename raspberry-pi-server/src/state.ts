@@ -10,8 +10,9 @@ export interface PiSensorData {
 export interface LoRaNodeData {
   devEui: string;
   deviceName?: string;
-  lightRaw: number; // Analog A0 (0 - 1023)
+  lightRaw: number; // Analog A0 (0 - 1023) from LDR AO
   lightPercent: number; // 0 - 100 %
+  lightDigital: boolean; // Digital D5 from LDR DO (true = Bright / เกินเกณฑ์ Trimpot, false = Dark)
   infraredDetected: boolean; // Digital D3 (true = obstacle detected, false = clear)
   ledState: "ON" | "OFF"; // Digital D4 (controlled via LoRa Downlink)
   rssi?: number;
@@ -25,6 +26,7 @@ export interface HistoryPoint {
   piHumidity: number;
   piDistanceCm: number;
   loraLightPercent: number;
+  loraLightDigital: boolean;
   loraInfraredDetected: boolean;
 }
 
@@ -43,6 +45,7 @@ class SystemState {
     deviceName: "arduino-r4-lora-node1",
     lightRaw: 680,
     lightPercent: 66.5,
+    lightDigital: true,
     infraredDetected: false,
     ledState: "OFF",
     rssi: -78,
@@ -62,6 +65,7 @@ class SystemState {
       piHumidity: this.pi.humidity,
       piDistanceCm: this.pi.distanceCm,
       loraLightPercent: this.loraNode1.lightPercent,
+      loraLightDigital: this.loraNode1.lightDigital,
       loraInfraredDetected: this.loraNode1.infraredDetected,
     });
 
@@ -79,4 +83,3 @@ class SystemState {
 }
 
 export const systemState = new SystemState();
-

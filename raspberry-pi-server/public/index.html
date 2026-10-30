@@ -145,16 +145,16 @@
 
         <!-- LoRa Sensor Metric Cards -->
         <div class="grid grid-cols-3 gap-3 mb-5">
-          <!-- Light Sensor (LDR A0) -->
+          <!-- Light Sensor (LDR LM393 Module: AO=A0, DO=D5) -->
           <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
             <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
               <span>Light (วัดแสง)</span>
-              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300">Pin A0</span>
+              <span id="loraLightDoBadge" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">DO(D5): สว่าง</span>
             </div>
             <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               <span id="loraLightPercent">66.5</span> <span class="text-sm font-normal text-slate-400">%</span>
             </div>
-            <div class="text-[11px] text-slate-500 mt-1 font-mono">Raw ADC: <span id="loraLightRaw">680</span> / 1023</div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">AO(A0): <span id="loraLightRaw">680</span>/1023</div>
           </div>
 
           <!-- Infrared Sensor (Digital D3) -->
@@ -262,8 +262,8 @@
               </tr>
               <tr>
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
-                <td class="py-2 pr-3">Light Sensor (LDR)</td>
-                <td class="py-2 pr-3">Analog Pin A0 (VCC=5V, GND)</td>
+                <td class="py-2 pr-3">Light Sensor (LDR LM393)</td>
+                <td class="py-2 pr-3">AO=A0 (Analog), DO=D5 (Digital Trimpot), VCC=5V, GND</td>
               </tr>
               <tr>
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
@@ -406,6 +406,16 @@
           // Update LoRa Node Readings
           document.getElementById('loraLightPercent').textContent = status.loraNode1.lightPercent.toFixed(1);
           document.getElementById('loraLightRaw').textContent = status.loraNode1.lightRaw;
+
+          const lightDoBadge = document.getElementById('loraLightDoBadge');
+          if (status.loraNode1.lightDigital) {
+            lightDoBadge.className = 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300';
+            lightDoBadge.textContent = 'DO(D5): สว่าง';
+          } else {
+            lightDoBadge.className = 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400';
+            lightDoBadge.textContent = 'DO(D5): มืด';
+          }
+
           document.getElementById('loraRssi').textContent = status.loraNode1.rssi ?? '-78';
           document.getElementById('loraSnr').textContent = status.loraNode1.snr ?? '9.5';
           document.getElementById('loraUpdatedAt').textContent = new Date(status.loraNode1.updatedAt).toLocaleTimeString('th-TH');

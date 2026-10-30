@@ -33,7 +33,7 @@ export function mountApiRoutes(app: Express): void {
         ...systemState.loraNode1,
         pins: {
           loraShield: "NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11/D12/D13",
-          lightLdr: "Analog A0",
+          lightLdr: "LM393 4-Pin: AO=Pin A0 (Analog), DO=Pin D5 (Digital Trimpot), GND, VCC=5V",
           infrared: "Digital D3",
           led: "Digital D4",
         },
@@ -112,6 +112,10 @@ export function mountApiRoutes(app: Express): void {
         ? Math.max(0, Math.min(1023, Math.round(req.body.lightRaw)))
         : Math.floor(300 + Math.random() * 650);
     const lightPercent = Number(((lightRaw / 1023) * 100).toFixed(1));
+    const lightDigital =
+      typeof req.body?.lightDigital === "boolean"
+        ? req.body.lightDigital
+        : lightPercent >= 50;
     const infraredDetected =
       typeof req.body?.infraredDetected === "boolean"
         ? req.body.infraredDetected
@@ -119,6 +123,7 @@ export function mountApiRoutes(app: Express): void {
 
     systemState.loraNode1.lightRaw = lightRaw;
     systemState.loraNode1.lightPercent = lightPercent;
+    systemState.loraNode1.lightDigital = lightDigital;
     systemState.loraNode1.infraredDetected = infraredDetected;
     systemState.loraNode1.updatedAt = new Date().toISOString();
 
