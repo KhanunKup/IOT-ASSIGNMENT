@@ -81,7 +81,7 @@ export function createMcpServerInstance(): Server {
         {
           name: "read_from_mqtt",
           description:
-            "Tool: Read from MQTT — อ่านค่าข้อมูลจาก MQTT Broker รวมถึงค่าจาก LoRa Node (Arduino UNO R4: เซนเซอร์วัดแสง LDR ขา A0, เซนเซอร์ Infrared ตรวจจับวัตถุขา D3, และสถานะไฟ LED ขา D4 บน topic 'lora/node1/data') หรือค่าจาก topic ของ Raspberry Pi",
+            "Tool: Read from MQTT — อ่านค่าข้อมูลจาก MQTT Broker รวมถึงค่าจาก LoRa Node (Arduino UNO R4: เซนเซอร์วัดแสง LM393 LDR ขา AO=A0 และ DO=D5, และสถานะไฟ LED ขา D4 บน topic 'lora/node1/data') หรือค่าจาก topic ของ Raspberry Pi",
           inputSchema: {
             type: "object",
             properties: {
@@ -250,11 +250,6 @@ export async function executeMcpTool(
             light_status: systemState.loraNode1.lightDigital
               ? "สว่างเกินเกณฑ์ Trimpot (Bright)"
               : "มืดกว่าเกณฑ์ Trimpot (Dark)",
-            infrared_obstacle_detected_d3:
-              systemState.loraNode1.infraredDetected,
-            infrared_status_text: systemState.loraNode1.infraredDetected
-              ? "ตรวจพบวัตถุ (Obstacle Detected)"
-              : "ปกติ ไม่พบวัตถุ (Clear)",
             led_state_d4: systemState.loraNode1.ledState,
             rssi_dbm: systemState.loraNode1.rssi,
             snr_db: systemState.loraNode1.snr,
@@ -263,7 +258,6 @@ export async function executeMcpTool(
           ports: {
             lora_shield: "NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11/D12/D13",
             light_sensor_ldr: "LM393 4-Pin Module: AO=Pin A0, DO=Pin D5, GND=GND, VCC=5V",
-            infrared_sensor: "Digital Pin D3",
             lora_node_led: "Digital Pin D4",
           },
         };
@@ -291,7 +285,6 @@ export async function executeMcpTool(
             light_raw: systemState.loraNode1.lightRaw,
             light_percent: `${systemState.loraNode1.lightPercent}%`,
             light_digital: systemState.loraNode1.lightDigital,
-            infrared_detected: systemState.loraNode1.infraredDetected,
             led_state: systemState.loraNode1.ledState,
             rssi: systemState.loraNode1.rssi,
             snr: systemState.loraNode1.snr,
@@ -463,7 +456,7 @@ export function mountMcpRoutes(app: Express): void {
               {
                 name: "read_from_mqtt",
                 description:
-                  "อ่านค่าจาก MQTT Broker รวมถึงค่าเซนเซอร์วัดแสง (LDR A0) และ Infrared (D3) จาก Arduino UNO R4 LoRa Node",
+                  "อ่านค่าจาก MQTT Broker รวมถึงค่าเซนเซอร์วัดแสง LM393 LDR (AO=A0, DO=D5) จาก Arduino UNO R4 LoRa Node",
                 inputSchema: {
                   type: "object",
                   properties: {

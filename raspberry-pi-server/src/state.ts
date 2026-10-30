@@ -13,7 +13,6 @@ export interface LoRaNodeData {
   lightRaw: number; // Analog A0 (0 - 1023) from LDR AO
   lightPercent: number; // 0 - 100 %
   lightDigital: boolean; // Digital D5 from LDR DO (true = Bright / เกินเกณฑ์ Trimpot, false = Dark)
-  infraredDetected: boolean; // Digital D3 (true = obstacle detected, false = clear)
   ledState: "ON" | "OFF"; // Digital D4 (controlled via LoRa Downlink)
   rssi?: number;
   snr?: number;
@@ -27,7 +26,6 @@ export interface HistoryPoint {
   piDistanceCm: number;
   loraLightPercent: number;
   loraLightDigital: boolean;
-  loraInfraredDetected: boolean;
 }
 
 class SystemState {
@@ -41,12 +39,11 @@ class SystemState {
   };
 
   public loraNode1: LoRaNodeData = {
-    devEui: "0000000000000000",
-    deviceName: "arduino-r4-lora-node1",
+    devEui: "d1b2824606880dcd",
+    deviceName: "LoRaWan",
     lightRaw: 680,
     lightPercent: 66.5,
     lightDigital: true,
-    infraredDetected: false,
     ledState: "OFF",
     rssi: -78,
     snr: 9.5,
@@ -66,7 +63,6 @@ class SystemState {
       piDistanceCm: this.pi.distanceCm,
       loraLightPercent: this.loraNode1.lightPercent,
       loraLightDigital: this.loraNode1.lightDigital,
-      loraInfraredDetected: this.loraNode1.infraredDetected,
     });
 
     if (this.history.length > this.maxHistoryLength) {

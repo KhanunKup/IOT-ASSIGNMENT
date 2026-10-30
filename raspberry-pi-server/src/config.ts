@@ -20,16 +20,17 @@ export const CONFIG = {
 
   // MQTT Broker Configuration
   mqttBrokerUrl: process.env.MQTT_BROKER_URL || "mqtt://lora.kmitl.ac.th:1883",
-  mqttUsername: process.env.MQTT_USERNAME || "",
-  mqttPassword: process.env.MQTT_PASSWORD || "",
+  mqttUsername: process.env.MQTT_USERNAME || "student_lab_it@kmitl.ac.th",
+  mqttPassword: process.env.MQTT_PASSWORD || "ZEMyrt77",
   mqttClientId:
     process.env.MQTT_CLIENT_ID ||
     `rpi4-mcp-iot-${Math.random().toString(16).slice(2, 8)}`,
 
   // ChirpStack Configuration (https://lora.kmitl.ac.th/)
-  chirpstackAppId: process.env.CHIRPSTACK_APP_ID || "your-application-id",
+  chirpstackAppId:
+    process.env.CHIRPSTACK_APP_ID || "91665bbd-da0f-486e-908a-a45de5148670",
   chirpstackDevEui: (
-    process.env.CHIRPSTACK_DEV_EUI || "0000000000000000"
+    process.env.CHIRPSTACK_DEV_EUI || "d1b2824606880dcd"
   ).toLowerCase(),
   chirpstackDownlinkFPort: parseInt(
     process.env.CHIRPSTACK_DOWNLINK_FPORT || "1",

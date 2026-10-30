@@ -19,15 +19,11 @@
  *      - ขา VCC                 : ต่อเข้า Pin 5V
  *      * บนโมดูลมีตัวต้านทานปรับค่าได้ (Trimpot สีฟ้า) สำหรับหมุนตั้งเกณฑ์ความไวของขา DO
  *
- *   3. เซนเซอร์ Infrared ตรวจจับวัตถุ (IR Obstacle - Digital):
- *      - ขา DO (OUT)            : ต่อเข้า Pin D3 (LOW = ตรวจพบวัตถุ, HIGH = ปกติ)
- *      - ขา VCC / GND           : 5V / GND
- *
- *   4. ไฟ LED สำหรับรับคำสั่งเปิด/ปิดผ่าน AI Chat box (LoRa Downlink):
+ *   3. ไฟ LED สำหรับรับคำสั่งเปิด/ปิดผ่าน AI Chat box (LoRa Downlink):
  *      - Anode (+)              : ต่อเข้า Pin D4 (ผ่านตัวต้านทาน 220Ω ลง GND)
  *      * หมายเหตุ: ไม่ใช้ D13 (LED_BUILTIN) เพราะ D13 ถูกใช้เป็นสัญญาณ SCK ของ SPI LoRa Shield
  *
- * ไลบรารีที่ต้องติดตั้งใน Arduino IDE:
+ * ไลบรารีที่ต้องติดตั้งใน Arduino IDE
  *   - ค้นหาและติดตั้ง "RadioLib" (โดย Jan Gromes) ใน Library Manager
  * ============================================================================
  */
@@ -35,7 +31,7 @@
 #include <RadioLib.h>
 
 // ----------------------------------------------------------------------------
-// 1. กำหนดขา Pin สำหรับ LoRa Shield และเซนเซอร์บน Arduino UNO R4
+// 1. กำหนดขา Pin สำหรับ LoRa Shield และอุปกรณ์บน Arduino UNO R4
 // ----------------------------------------------------------------------------
 #define LORA_NSS_PIN   10
 #define LORA_DIO0_PIN  2
@@ -46,8 +42,7 @@
 #define PIN_LIGHT_AO   A0   // ขา AO: อ่านระดับความเข้มแสงแบบ Analog (0 - 1023)
 #define PIN_LIGHT_DO   5    // ขา DO: อ่านสถานะมืด/สว่างตามเกณฑ์ Trimpot (Digital Input D5)
 
-// ขาสำหรับเซนเซอร์ Infrared และ LED
-#define PIN_IR_SENSOR  3    // เซนเซอร์ Infrared ตรวจจับวัตถุ (Digital Input D3)
+// ขาสำหรับไฟ LED บน LoRa Node
 #define PIN_NODE_LED   4    // ไฟ LED สำหรับสั่งเปิด/ปิดจาก AI Chat box (Digital Output D4)
 
 // สร้างออบเจกต์ชิป SX1276 (RFM95)
@@ -58,17 +53,25 @@ LoRaWANNode node(&radio, &AS923);
 
 // ----------------------------------------------------------------------------
 // 2. ตั้งค่ากุญแจ OTAA จากเว็บ ChirpStack (https://lora.kmitl.ac.th/)
-//    *** นำค่า DevEUI, JoinEUI (AppEUI), และ AppKey จากหน้าเว็บมาใส่ตรงนี้ ***
+//    Application: 67070044 (ID: 91665bbd-da0f-486e-908a-a45de5148670)
+//    Device: LoRaWan
 // ----------------------------------------------------------------------------
-uint64_t joinEUI = 0x0000000000000000ULL; // JoinEUI / AppEUI (64-bit Hex)
-uint64_t devEUI  = 0x0000000000000000ULL; // Device EUI จาก lora.kmitl.ac.th
+// Join EUI / AppEUI (64-bit Hex): 0c8badd9567b322f
+uint64_t joinEUI = 0x0C8BADD9567B322FULL; // หาก Join ไม่ผ่าน ให้ลอง 0x2F327B56D9AD8B0CULL
+
+// Device EUI: d1b2824606880dcd (ตามที่แสดงในหน้าเว็บ ChirpStack)
+uint64_t devEUI  = 0xD1B2824606880DCDULL; // หาก Join ไม่ผ่าน ให้ลอง 0xCD0D88064682B2D1ULL
+
+// Application Key: 7d3488d5f6b4d4159ac69658df468716
 uint8_t appKey[] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  0x7D, 0x34, 0x88, 0xD5, 0xF6, 0xB4, 0xD4, 0x15,
+  0x9A, 0xC6, 0x96, 0x58, 0xDF, 0x46, 0x87, 0x16
 };
+
+// Network Key (LoRaWAN 1.0.x ใช้ค่าเดียวกับ appKey)
 uint8_t nwkKey[] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  0x7D, 0x34, 0x88, 0xD5, 0xF6, 0xB4, 0xD4, 0x15,
+  0x9A, 0xC6, 0x96, 0x58, 0xDF, 0x46, 0x87, 0x16
 };
 
 bool ledState = false;
@@ -82,14 +85,13 @@ void setup() {
   // ตั้งค่าโหมดขา Pin
   pinMode(PIN_LIGHT_AO, INPUT);
   pinMode(PIN_LIGHT_DO, INPUT);
-  pinMode(PIN_IR_SENSOR, INPUT_PULLUP);
   pinMode(PIN_NODE_LED, OUTPUT);
   digitalWrite(PIN_NODE_LED, LOW);
 
   Serial.println(F("===================================================="));
   Serial.println(F(" Arduino UNO R4 + LoRa Shield (SX1276/RFM95) Start"));
   Serial.println(F(" LDR Module 4-Pin: AO=A0, DO=D5, GND, VCC=5V"));
-  Serial.println(F(" Infrared: D3 | Node LED: D4"));
+  Serial.println(F(" Node LED: Pin D4"));
   Serial.println(F("===================================================="));
 
   Serial.print(F("[SX1276] Initializing radio... "));
@@ -121,28 +123,21 @@ void sendSensorUplinkAndCheckDownlink() {
   //    - ขา DO (Digital): โมดูล LM393 ส่วนใหญ่จ่าย LOW เมื่อแสงสว่างเกินเกณฑ์ Trimpot (สว่างจ้า), HIGH เมื่อมืด
   bool lightThresholdExceeded = (digitalRead(PIN_LIGHT_DO) == LOW);
 
-  // 2. อ่านค่าเซนเซอร์ Infrared ตรวจจับวัตถุ (ขา D3: จ่าย LOW เมื่อตรวจพบวัตถุ)
-  bool obstacleDetected = (digitalRead(PIN_IR_SENSOR) == LOW);
-
-  // 3. จัดแพ็กเกจข้อมูล 5 Bytes สำหรับส่งขึ้น LoRaWAN
+  // 2. จัดแพ็กเกจข้อมูล 4 Bytes สำหรับส่งขึ้น LoRaWAN
   //    Byte 0: Light Raw MSB (Analog AO)
   //    Byte 1: Light Raw LSB (Analog AO)
-  //    Byte 2: Infrared (1 = Detected, 0 = Clear)
+  //    Byte 2: Light DO Digital (1 = สว่างเกินเกณฑ์ Trimpot, 0 = มืด/ต่ำกว่าเกณฑ์)
   //    Byte 3: LED State on D4 (1 = ON, 0 = OFF)
-  //    Byte 4: Light DO Digital (1 = สว่างเกินเกณฑ์ Trimpot, 0 = มืด/ต่ำกว่าเกณฑ์)
-  uint8_t uplinkPayload[5];
+  uint8_t uplinkPayload[4];
   uplinkPayload[0] = (uint8_t)((lightRaw >> 8) & 0xFF);
   uplinkPayload[1] = (uint8_t)(lightRaw & 0xFF);
-  uplinkPayload[2] = obstacleDetected ? 0x01 : 0x00;
+  uplinkPayload[2] = lightThresholdExceeded ? 0x01 : 0x00;
   uplinkPayload[3] = ledState ? 0x01 : 0x00;
-  uplinkPayload[4] = lightThresholdExceeded ? 0x01 : 0x00;
 
   Serial.print(F("[Sensors] Light AO(A0)="));
   Serial.print(lightRaw);
   Serial.print(F(" | Light DO(D5)="));
   Serial.print(lightThresholdExceeded ? F("BRIGHT") : F("DARK"));
-  Serial.print(F(" | Infrared(D3)="));
-  Serial.print(obstacleDetected ? F("DETECTED") : F("CLEAR"));
   Serial.print(F(" | LED(D4)="));
   Serial.println(ledState ? F("ON") : F("OFF"));
 

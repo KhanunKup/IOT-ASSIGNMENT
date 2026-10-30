@@ -34,7 +34,6 @@ export function mountApiRoutes(app: Express): void {
         pins: {
           loraShield: "NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11/D12/D13",
           lightLdr: "LM393 4-Pin: AO=Pin A0 (Analog), DO=Pin D5 (Digital Trimpot), GND, VCC=5V",
-          infrared: "Digital D3",
           led: "Digital D4",
         },
       },
@@ -104,7 +103,7 @@ export function mountApiRoutes(app: Express): void {
 
   /**
    * POST /api/simulate/lora
-   * Simulate or inject an incoming LoRa Node reading (Light A0 & Infrared D3) for testing
+   * Simulate or inject an incoming LoRa Node reading (Light AO & DO) for testing
    */
   app.post("/api/simulate/lora", (req: Request, res: Response) => {
     const lightRaw =
@@ -116,15 +115,10 @@ export function mountApiRoutes(app: Express): void {
       typeof req.body?.lightDigital === "boolean"
         ? req.body.lightDigital
         : lightPercent >= 50;
-    const infraredDetected =
-      typeof req.body?.infraredDetected === "boolean"
-        ? req.body.infraredDetected
-        : !systemState.loraNode1.infraredDetected;
 
     systemState.loraNode1.lightRaw = lightRaw;
     systemState.loraNode1.lightPercent = lightPercent;
     systemState.loraNode1.lightDigital = lightDigital;
-    systemState.loraNode1.infraredDetected = infraredDetected;
     systemState.loraNode1.updatedAt = new Date().toISOString();
 
     systemState.recordHistoryPoint();

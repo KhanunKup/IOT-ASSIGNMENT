@@ -6,17 +6,15 @@ import { systemState } from "../state";
 let client: MqttClient | null = null;
 
 /**
- * Decode 5-byte binary payload from Arduino UNO R4 LoRa Node:
+ * Decode 4-byte binary payload from Arduino UNO R4 LoRa Node:
  *   Byte 0..1: uint16_t lightRaw (0 - 1023) from LDR AO (Pin A0)
- *   Byte 2:    uint8_t  infraredDetected (1 = obstacle detected, 0 = clear) from IR DO (Pin D3)
+ *   Byte 2:    uint8_t  lightDigital (1 = bright / เกินเกณฑ์ Trimpot, 0 = dark) from LDR DO (Pin D5)
  *   Byte 3:    uint8_t  ledState (1 = ON, 0 = OFF) on Pin D4
- *   Byte 4:    uint8_t  lightDigital (1 = bright / เกินเกณฑ์ Trimpot, 0 = dark) from LDR DO (Pin D5)
  */
 export function decodeLoRaBinaryPayload(base64Data: string): {
   lightRaw: number;
   lightPercent: number;
   lightDigital: boolean;
-  infraredDetected: boolean;
   ledState: "ON" | "OFF";
 } | null {
   try {
@@ -27,15 +25,13 @@ export function decodeLoRaBinaryPayload(base64Data: string): {
     const lightPercent = Number(
       Math.min(100, Math.max(0, (lightRaw / 1023) * 100)).toFixed(1)
     );
-    const infraredDetected = buf[2] === 1;
+    const lightDigital = buf[2] === 1;
     const ledState: "ON" | "OFF" = buf.length >= 4 && buf[3] === 1 ? "ON" : "OFF";
-    const lightDigital = buf.length >= 5 ? buf[4] === 1 : lightPercent >= 50;
 
     return {
       lightRaw,
       lightPercent,
       lightDigital,
-      infraredDetected,
       ledState,
     };
   } catch {
@@ -128,7 +124,6 @@ export function initMqttClient(): void {
         let lightRaw = systemState.loraNode1.lightRaw;
         let lightPercent = systemState.loraNode1.lightPercent;
         let lightDigital = systemState.loraNode1.lightDigital;
-        let infraredDetected = systemState.loraNode1.infraredDetected;
         let ledState = systemState.loraNode1.ledState;
 
         // If ChirpStack Payload Codec decoded `object`
@@ -146,8 +141,6 @@ export function initMqttClient(): void {
           else if (typeof obj.light_digital_d5 === "boolean")
             lightDigital = obj.light_digital_d5;
 
-          if (typeof obj.infrared_detected === "boolean")
-            infraredDetected = obj.infrared_detected;
           if (obj.led_state === "ON" || obj.led_state === "OFF")
             ledState = obj.led_state;
         } else if (typeof parsed.data === "string" && parsed.data.length > 0) {
@@ -157,7 +150,6 @@ export function initMqttClient(): void {
             lightRaw = decoded.lightRaw;
             lightPercent = decoded.lightPercent;
             lightDigital = decoded.lightDigital;
-            infraredDetected = decoded.infraredDetected;
             ledState = decoded.ledState;
           }
         }
@@ -168,7 +160,6 @@ export function initMqttClient(): void {
           lightRaw,
           lightPercent,
           lightDigital,
-          infraredDetected,
           ledState,
           rssi,
           snr,
@@ -208,11 +199,6 @@ export function initMqttClient(): void {
             systemState.loraNode1.lightDigital = data.light_digital;
           } else if (typeof data.light_digital_d5 === "boolean") {
             systemState.loraNode1.lightDigital = data.light_digital_d5;
-          }
-          if (typeof data.infraredDetected === "boolean") {
-            systemState.loraNode1.infraredDetected = data.infraredDetected;
-          } else if (typeof data.infrared_detected === "boolean") {
-            systemState.loraNode1.infraredDetected = data.infrared_detected;
           }
           if (data.ledState === "ON" || data.ledState === "OFF") {
             systemState.loraNode1.ledState = data.ledState;

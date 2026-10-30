@@ -33,7 +33,7 @@
               ระบบ IoT ควบคุม/อ่านค่า ผ่าน AI Chat box (MCP Server & Web Dashboard)
             </h1>
             <p class="text-xs text-slate-400">
-              Raspberry Pi 4 (SHT31 + HC-SR04 + LED) &bull; Arduino UNO R4 LoRa Shield (LDR + Infrared + LED) &bull; ChirpStack (<span class="text-sky-400">lora.kmitl.ac.th</span>)
+              Raspberry Pi 4 (SHT31 + HC-SR04 + LED) &bull; Arduino UNO R4 LoRa Shield (LM393 LDR + LED) &bull; ChirpStack (<span class="text-sky-400">lora.kmitl.ac.th</span>)
             </p>
           </div>
         </div>
@@ -144,41 +144,27 @@
         </div>
 
         <!-- LoRa Sensor Metric Cards -->
-        <div class="grid grid-cols-3 gap-3 mb-5">
+        <div class="grid grid-cols-2 gap-3 mb-5">
           <!-- Light Sensor (LDR LM393 Module: AO=A0, DO=D5) -->
           <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
             <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
-              <span>Light (วัดแสง)</span>
+              <span>Light (วัดแสง LM393)</span>
               <span id="loraLightDoBadge" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">DO(D5): สว่าง</span>
             </div>
             <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               <span id="loraLightPercent">66.5</span> <span class="text-sm font-normal text-slate-400">%</span>
             </div>
-            <div class="text-[11px] text-slate-500 mt-1 font-mono">AO(A0): <span id="loraLightRaw">680</span>/1023</div>
-          </div>
-
-          <!-- Infrared Sensor (Digital D3) -->
-          <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
-            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
-              <span>Infrared (IR)</span>
-              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-rose-300">Pin D3</span>
-            </div>
-            <div class="mt-1">
-              <span id="loraIrBadge" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                ปกติ (Clear)
-              </span>
-            </div>
-            <div class="text-[11px] text-slate-500 mt-2 font-mono">Obstacle Detection</div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">AO(A0): <span id="loraLightRaw">680</span>/1023 &bull; Trimpot D5</div>
           </div>
 
           <!-- LoRa Signal RSSI / SNR -->
           <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
             <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
               <span>LoRa RF Signal</span>
-              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-sky-300">SX1276</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-sky-300">AS923</span>
             </div>
-            <div class="text-lg font-bold text-white tracking-tight">
-              <span id="loraRssi">-78</span> <span class="text-xs font-normal text-slate-400">dBm</span>
+            <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <span id="loraRssi">-78</span> <span class="text-sm font-normal text-slate-400">dBm</span>
             </div>
             <div class="text-[11px] text-slate-500 mt-1 font-mono">SNR: <span id="loraSnr">9.5</span> dB &bull; lora/node1/data</div>
           </div>
@@ -264,11 +250,6 @@
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
                 <td class="py-2 pr-3">Light Sensor (LDR LM393)</td>
                 <td class="py-2 pr-3">AO=A0 (Analog), DO=D5 (Digital Trimpot), VCC=5V, GND</td>
-              </tr>
-              <tr>
-                <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
-                <td class="py-2 pr-3">Infrared Obstacle Sensor</td>
-                <td class="py-2 pr-3">Digital Pin D3 (VCC=5V, GND)</td>
               </tr>
               <tr>
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
@@ -419,15 +400,6 @@
           document.getElementById('loraRssi').textContent = status.loraNode1.rssi ?? '-78';
           document.getElementById('loraSnr').textContent = status.loraNode1.snr ?? '9.5';
           document.getElementById('loraUpdatedAt').textContent = new Date(status.loraNode1.updatedAt).toLocaleTimeString('th-TH');
-
-          const irBadge = document.getElementById('loraIrBadge');
-          if (status.loraNode1.infraredDetected) {
-            irBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40';
-            irBadge.textContent = 'ตรวจพบวัตถุ! (Obstacle)';
-          } else {
-            irBadge.className = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-            irBadge.textContent = 'ปกติ (Clear)';
-          }
 
           // Update LoRa LED Indicator
           const loraLedOn = status.loraNode1.ledState === 'ON';
