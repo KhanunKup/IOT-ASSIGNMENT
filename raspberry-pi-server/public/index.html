@@ -145,16 +145,16 @@
 
         <!-- LoRa Sensor Metric Cards -->
         <div class="grid grid-cols-2 gap-3 mb-5">
-          <!-- Light Sensor (LDR LM393 Module: AO=A0, DO=D5) -->
+          <!-- Light Sensor (LDR LM393 Module: AO=A0, DO=D3) -->
           <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-3.5">
             <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
               <span>Light (วัดแสง LM393)</span>
-              <span id="loraLightDoBadge" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">DO(D5): สว่าง</span>
+              <span id="loraLightDoBadge" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">DO(D3): สว่าง</span>
             </div>
             <div class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               <span id="loraLightPercent">66.5</span> <span class="text-sm font-normal text-slate-400">%</span>
             </div>
-            <div class="text-[11px] text-slate-500 mt-1 font-mono">AO(A0): <span id="loraLightRaw">680</span>/1023 &bull; Trimpot D5</div>
+            <div class="text-[11px] text-slate-500 mt-1 font-mono">AO(A0): <span id="loraLightRaw">680</span>/1023 &bull; Trimpot D3</div>
           </div>
 
           <!-- LoRa Signal RSSI / SNR -->
@@ -244,12 +244,12 @@
               <tr>
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
                 <td class="py-2 pr-3">LoRa Shield SX1276</td>
-                <td class="py-2 pr-3">NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11-D13</td>
+                <td class="py-2 pr-3">NSS=D10, RST=D7, DIO0=D2, DIO1=D5, DIO2=D6, SPI=D11-D13</td>
               </tr>
               <tr>
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
                 <td class="py-2 pr-3">Light Sensor (LDR LM393)</td>
-                <td class="py-2 pr-3">AO=A0 (Analog), DO=D5 (Digital Trimpot), VCC=5V, GND</td>
+                <td class="py-2 pr-3">AO=A0 (Analog), DO=D3 (Digital Trimpot), VCC=5V, GND</td>
               </tr>
               <tr>
                 <td class="py-2 pr-3 text-sky-400">Arduino UNO R4</td>
@@ -391,10 +391,10 @@
           const lightDoBadge = document.getElementById('loraLightDoBadge');
           if (status.loraNode1.lightDigital) {
             lightDoBadge.className = 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300';
-            lightDoBadge.textContent = 'DO(D5): สว่าง';
+            lightDoBadge.textContent = 'DO(D3): สว่าง';
           } else {
             lightDoBadge.className = 'font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400';
-            lightDoBadge.textContent = 'DO(D5): มืด';
+            lightDoBadge.textContent = 'DO(D3): มืด';
           }
 
           document.getElementById('loraRssi').textContent = status.loraNode1.rssi ?? '-78';

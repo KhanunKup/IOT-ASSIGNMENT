@@ -256,8 +256,8 @@ export async function executeMcpTool(
             updatedAt: systemState.loraNode1.updatedAt,
           },
           ports: {
-            lora_shield: "NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11/D12/D13",
-            light_sensor_ldr: "LM393 4-Pin Module: AO=Pin A0, DO=Pin D5, GND=GND, VCC=5V",
+            lora_shield: "NSS=D10, RST=D7, DIO0=D2, DIO1=D5, DIO2=D6, SPI=D11/D12/D13",
+            light_sensor_ldr: "LM393 4-Pin Module: AO=Pin A0, DO=Pin D3, GND=GND, VCC=5V",
             lora_node_led: "Digital Pin D4",
           },
         };

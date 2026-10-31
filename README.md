@@ -8,8 +8,8 @@
    - เซนเซอร์วัดระยะทาง **Ultrasonic HC-SR04 (GPIO 23/24)**
    - ไฟ **LED บน Raspberry Pi (GPIO 17)**
 4. **MQTT Broker**: เชื่อมต่อผ่าน Broker กลาง (เช่น `lora.kmitl.ac.th:1883`)
-5. **LoRa Node**: **Arduino UNO R4 + Dragino LoRa Shield (SX1276/RFM95)**:
-   - โมดูลวัดแสง **LM393 LDR (4 ขา: AO=A0, DO=D5, GND, VCC=5V)**
+5. **LoRa Node**: **Arduino UNO R4 + LoRa Shield (SX1276/RFM95)**:
+   - โมดูลวัดแสง **LM393 LDR (4 ขา: AO=A0, DO=D3, GND, VCC=5V)**
    - ไฟ **LED บน LoRa Node (Pin D4)** สำหรับรับคำสั่ง Downlink เปิด/ปิดไฟ
 6. **LoRa Network Server**: เชื่อมต่อเข้า **ChirpStack (`https://lora.kmitl.ac.th/`)**
 7. **Web Dashboard**: หน้าเว็บแสดงผลแบบ Live Data พร้อมปุ่มสวิตช์ควบคุม เชื่อมต่อกับ Raspberry Pi ด้วย **HTTP REST API**
@@ -47,9 +47,9 @@
 
 | อุปกรณ์ | ขาของอุปกรณ์ | ขาบน Arduino UNO R4 | ประเภทสัญญาณ / หน้าที่ |
 | :--- | :--- | :--- | :--- |
-| **LoRa Shield (SX1276)** | `NSS / RST / DIO0 / DIO1` | **D10 / D9 / D2 / D6** | สื่อสาร LoRaWAN (และ SPI `D11-D13`) |
+| **LoRa Shield (SX1276)** | `NSS / RST / DIO0 / DIO1 / DIO2` | **D10 / D7 / D2 / D5 / D6** | สื่อสาร LoRaWAN (และ SPI `D11-D13`) |
 | **โมดูลวัดแสง LM393 LDR (4 ขา)** | `AO` (Analog Output) | **Pin A0** | อ่านระดับความสว่างละเอียดแบบ Analog (`0 - 1023` หรือ `0 - 100%`) |
-| **โมดูลวัดแสง LM393 LDR (4 ขา)** | `DO` (Digital Output) | **Pin D5** | ตัดต่อสถานะสว่าง/มืดตามเกณฑ์ Trimpot (`LOW` = สว่างจ้า, `HIGH` = มืด) |
+| **โมดูลวัดแสง LM393 LDR (4 ขา)** | `DO` (Digital Output) | **Pin D3** | ตัดต่อสถานะสว่าง/มืดตามเกณฑ์ Trimpot *(ย้ายจาก D5 มา D3 เพื่อไม่ให้ชนกับ DIO1 ของ Shield)* |
 | **โมดูลวัดแสง LM393 LDR (4 ขา)** | `GND` | **Pin GND** | กราวด์ |
 | **โมดูลวัดแสง LM393 LDR (4 ขา)** | `VCC` | **Pin 5V** | ไฟเลี้ยง 5V |
 | **ไฟ LED บน LoRa Node** | `Anode (+)` | **Pin D4** | ต่อผ่านตัวต้านทาน `220Ω` สำหรับรับคำสั่ง Downlink เปิด/ปิดไฟ |
@@ -57,30 +57,36 @@
 
 ---
 
-## 2. ขั้นตอนการลงโค้ดบน Arduino UNO R4
+## 2. ขั้นตอนการทดสอบเชื่อมต่อและลงโค้ดบน Arduino UNO R4
 
 1. **เปิด Arduino IDE** บนคอมพิวเตอร์
-2. **ติดตั้งบอร์ด Arduino UNO R4**:
-   - ไปที่เมนู `Tools` -> `Board` -> `Boards Manager...`
-   - ค้นหา **"Arduino UNO R4"** (เช่น `Arduino UNO R4 Boards`) แล้วกด **Install**
-3. **ติดตั้งไลบรารี RadioLib**:
+2. **ติดตั้งไลบรารี MCCI LoRaWAN LMIC library**:
    - ไปที่ `Sketch` -> `Include Library` -> `Manage Libraries...`
-   - ค้นหา **"RadioLib"** (โดย Jan Gromes) แล้วกด **Install**
-4. **เปิดไฟล์โค้ด**:
+   - ค้นหา **"MCCI LoRaWAN LMIC library"** (โดย Terry Moore, MCCI) แล้วกด **Install**
+   - *(ตรวจสอบว่าความถี่ใน lmic_project_config.h ตั้งค่าเป็น CFG_as923 ตามที่ใช้ในแล็บ)*
+3. **เปิดไฟล์โค้ด**:
    - เปิดไฟล์ `arduino-r4-lora-node/arduino-r4-lora-node.ino`
-5. **กรอกกุญแจ OTAA จาก ChirpStack (`https://lora.kmitl.ac.th/`)**:
-   - ล็อกอินเข้าสู่เว็บ `https://lora.kmitl.ac.th/`
-   - เข้าไปที่ Application ของคุณ -> เลือก Device ของ Arduino R4
-   - คัดลอกค่า **Device EUI**, **Join EUI (AppEUI)** และ **AppKey** มากรอกในโค้ดบรรทัดที่ 53 - 62:
+   - โค้ดนี้ใส่ค่า APPEUI, DEVEUI, APPKEY ของ ChirpStack (`lora.kmitl.ac.th`) และ Pin Map (`NSS=10, RST=7, DIO={2,5,6}`) เรียบร้อยแล้ว
+4. **โหมดทดสอบการเชื่อมต่อ (Connection Test)**:
+   - ในไฟล์บรรทัดที่ 24 จะตั้งค่าไว้ล่วงหน้า:
      ```cpp
-     uint64_t joinEUI = 0x...ULL;
-     uint64_t devEUI  = 0x...ULL;
-     uint8_t appKey[] = { 0x.., 0x.., ... };
+     const bool TEST_MODE_ONLY = true;
      ```
-6. **อัปโหลด**:
+   - ในโหมดนี้ บอร์ดจะส่งเฉพาะข้อความ `"Hello ChirpStack"` ขึ้นไป เพื่อให้ทดสอบได้ทันทีโดยไม่ต้องต่อเซนเซอร์ก่อน
+5. **อัปโหลด**:
    - เสียบสาย USB เข้า Arduino UNO R4
-   - เลือก Port ให้ตรง แล้วกดปุ่ม **Upload (ลูกศรขวา)**
-   - เปิด **Serial Monitor (Baud rate: 115200)** เพื่อดูสถานะการ Join และการส่ง Uplink
+   - เลือก Port ให้ตรง แล้วกดปุ่ม **Upload**
+   - เปิด **Serial Monitor (Baud rate: 115200)** จะเห็นข้อความ:
+     - `EV_JOINING: กำลังส่ง Join-Request ไปยัง ChirpStack...`
+     - เมื่อต่อติดจะขึ้น `EV_JOINED: เชื่อมต่อ ChirpStack สำเร็จแล้ว!`
+     - จากนั้นเข้าดูที่เว็บ `https://lora.kmitl.ac.th/` -> Device `LoRaWan` -> แท็บ **Live Device Data** จะเห็นแพ็กเกจขึ้นมาทันที!
+6. **สลับไปโหมดเซนเซอร์จริง (เมื่อ Join สำเร็จแล้ว)**:
+   - นำเซนเซอร์ LDR มาต่อตามตารางด้านบน (`AO` -> `A0`, `DO` -> `D3`, `VCC` -> `5V`, `GND` -> `GND`)
+   - แก้ไขบรรทัดที่ 24 เป็น:
+     ```cpp
+     const bool TEST_MODE_ONLY = false;
+     ```
+   - กด Upload ใหม่อีกครั้ง ระบบจะส่งค่าเซนเซอร์ 4 Bytes ขึ้น ChirpStack ทุก 15 วินาที
 
 ---
 

@@ -32,8 +32,8 @@ export function mountApiRoutes(app: Express): void {
       loraNode1: {
         ...systemState.loraNode1,
         pins: {
-          loraShield: "NSS=D10, RST=D9, DIO0=D2, DIO1=D6, SPI=D11/D12/D13",
-          lightLdr: "LM393 4-Pin: AO=Pin A0 (Analog), DO=Pin D5 (Digital Trimpot), GND, VCC=5V",
+          loraShield: "NSS=D10, RST=D7, DIO0=D2, DIO1=D5, DIO2=D6, SPI=D11/D12/D13",
+          lightLdr: "LM393 4-Pin: AO=Pin A0 (Analog), DO=Pin D3 (Digital Trimpot), GND, VCC=5V",
           led: "Digital D4",
         },
       },

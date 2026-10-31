@@ -1,210 +1,241 @@
-/**
- * ============================================================================
- * Arduino UNO R4 + LoRa Shield (SX1276 / RFM95) Firmware
- * ============================================================================
+/*******************************************************************************
+ * Arduino UNO R4 + LoRa Shield Firmware (LMIC OTAA)
  * เชื่อมต่อ LoRaWAN Network Server (ChirpStack: https://lora.kmitl.ac.th/)
+ * 
  * Application: 67070044 (ID: 91665bbd-da0f-486e-908a-a45de5148670)
- * Device: LoRaWan (Profile: Cytron - LoRaWAN 1.0.x)
+ * Device: LoRaWan (Device Profile: Cytron)
  *
- * การกำหนดขา Pin (Pin Mapping):
- *   1. LoRa Shield (SX1276/RFM95):
- *      - NSS (CS) : Pin D10
- *      - DIO0     : Pin D2
- *      - RST      : Pin D9
- *      - DIO1     : Pin D6 (*** สำคัญ: ต้องเสียบ Jumper บริดจ์ขา DIO1 กับ D6 บน Shield ***)
- *      - SPI Bus  : Pin D11 (MOSI), D12 (MISO), D13 (SCK)
- *
- *   2. โมดูลวัดแสง LM393 LDR (แบบ 4 ขา: AO, DO, GND, VCC):
- *      - ขา AO (Analog Output)  : ต่อเข้า Pin A0 (0 - 1023 โดยค่าต่ำ = สว่างมาก, ค่าสูง = มืด)
- *      - ขา DO (Digital Output) : ต่อเข้า Pin D5 (LOW = สว่างเกินเกณฑ์ Trimpot, HIGH = มืด)
- *      - ขา GND                 : ต่อเข้า Pin GND
- *      - ขา VCC                 : ต่อเข้า Pin 5V
- *
- *   3. ไฟ LED สำหรับรับคำสั่งเปิด/ปิดผ่าน AI Chat box (LoRa Downlink):
- *      - Anode (+)              : ต่อเข้า Pin D4 (ผ่านตัวต้านทาน 220Ω ลง GND)
- * ============================================================================
- */
+ * การกำหนดขา Pin (Pin Mapping ตามบอร์ด Shield ในแล็บ):
+ *   - LoRa Shield: NSS=10, RST=7, DIO0=2, DIO1=5, DIO2=6, SPI=D11-D13
+ *   - ไฟ LED รับคำสั่ง Downlink: Pin D4
+ *   - โมดูลวัดแสง LDR (4 ขา): ขา AO -> Pin A0, ขา DO -> Pin D3
+ *     (หมายเหตุ: ย้ายขา DO จาก D5 ไป D3 เพราะ D5 ถูกจองเป็นขา DIO1 ของ LoRa Shield)
+ *******************************************************************************/
 
-#include <RadioLib.h>
+#include <lmic.h>
+#include <hal/hal.h>
+#include <SPI.h>
 
 // ----------------------------------------------------------------------------
-// 1. กำหนดขา Pin สำหรับ LoRa Shield และอุปกรณ์บน Arduino UNO R4
+// 1. ตั้งค่าโหมดการทำงาน
 // ----------------------------------------------------------------------------
-#define LORA_NSS_PIN   10
-#define LORA_DIO0_PIN  2
-#define LORA_RST_PIN   9
-#define LORA_DIO1_PIN  6  // Dragino Shield: ต้องมี Jumper เสียบระหว่าง DIO1 กับ D6
+// ตั้งเป็น true: ส่งข้อความทดสอบ "HELLO" เพื่อยืนยันว่าเชื่อมต่อ ChirpStack ได้สำเร็จ 100%
+// ตั้งเป็น false: สลับไปอ่านค่าเซนเซอร์วัดแสง LDR (A0, D3) ส่งขึ้นระบบ
+const bool TEST_MODE_ONLY = true;
 
-#define PIN_LIGHT_AO   A0 // ขา AO: อ่านระดับแสง Analog
-#define PIN_LIGHT_DO   5  // ขา DO: อ่านสถานะมืด/สว่างตามเกณฑ์ Trimpot (Digital Input D5)
-#define PIN_NODE_LED   4  // ไฟ LED รับคำสั่ง Downlink (Digital Output D4)
+// ช่วงเวลาส่งข้อมูล (วินาที)
+const unsigned TX_INTERVAL = 15;
 
-// สร้างออบเจกต์ชิป SX1276 (RFM95)
-SX1276 radio = new Module(LORA_NSS_PIN, LORA_DIO0_PIN, LORA_RST_PIN, LORA_DIO1_PIN);
+// ขาสำหรับอุปกรณ์เสริม
+#define PIN_NODE_LED   4   // ไฟ LED สำหรับทดสอบรับคำสั่ง Downlink
+#define PIN_LIGHT_AO   A0  // เซนเซอร์วัดแสง LDR ขา AO (Analog 0 - 1023)
+#define PIN_LIGHT_DO   3   // เซนเซอร์วัดแสง LDR ขา DO (Digital Input D3)
 
-// ตั้งค่าความถี่ LoRaWAN โซนประเทศไทย AS923 (ChirpStack: lora.kmitl.ac.th)
-LoRaWANNode node(&radio, &AS923);
+bool ledState = false;
 
 // ----------------------------------------------------------------------------
-// 2. ตั้งค่ากุญแจ OTAA จากเว็บ ChirpStack (Application: 67070044 / Device: LoRaWan)
+// 2. กุญแจ OTAA จาก ChirpStack (Little-endian สำหรับ APPEUI & DEVEUI)
 // ----------------------------------------------------------------------------
-// Join EUI / AppEUI (64-bit Hex): 0c8badd9567b322f
-uint64_t joinEUI = 0x0C8BADD9567B322FULL;
+// APPEUI / JoinEUI: 0c8badd9567b322f (Little-endian: LSB first)
+static const u1_t PROGMEM APPEUI[8] = { 0x0C, 0x8B, 0xAD, 0xD9, 0x56, 0x7B, 0x32, 0x2F };
+void os_getArtEui (u1_t* buf) { memcpy_P(buf, APPEUI, 8); }
 
-// Device EUI: d1b2824606880dcd
-// หมายเหตุ: RadioLib ใช้ลำดับ MSB ตามที่แสดงในตาราง ChirpStack
-uint64_t devEUI  = 0xD1B2824606880DCDULL;
-// หาก Join ไม่ผ่าน ให้สลับเป็นแบบ LSB: uint64_t devEUI = 0xCD0D88064682B2D1ULL;
+// DEVEUI: cd0d88064682b2d1 (Little-endian: LSB first)
+static const u1_t PROGMEM DEVEUI[8] = { 0xCD, 0x0D, 0x88, 0x06, 0x46, 0x82, 0xB2, 0xD1 };
+void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8); }
 
-// Application Key: 7d3488d5f6b4d4159ac69658df468716
-uint8_t appKey[] = {
-  0x7D, 0x34, 0x88, 0xD5, 0xF6, 0xB4, 0xD4, 0x15,
-  0x9A, 0xC6, 0x96, 0x58, 0xDF, 0x46, 0x87, 0x16
+// APPKEY: 7d3488d5f6b4d4159ac69658df468716 (Big-endian: MSB first)
+static const u1_t PROGMEM APPKEY[16] = { 0x7D, 0x34, 0x88, 0xD5, 0xF6, 0xB4, 0xD4, 0x15, 0x9A, 0xC6, 0x96, 0x58, 0xDF, 0x46, 0x87, 0x16 };
+void os_getDevKey (u1_t* buf) { memcpy_P(buf, APPKEY, 16); }
+
+static osjob_t sendjob;
+
+// ----------------------------------------------------------------------------
+// 3. กำหนดขา Pin ของ LoRa Shield (ตรงตามไฟล์แล็บเดิม)
+// ----------------------------------------------------------------------------
+const lmic_pinmap lmic_pins = {
+    .nss = 10,
+    .rxtx = LMIC_UNUSED_PIN,
+    .rst = 7,
+    .dio = {2, 5, 6}, // DIO0=D2, DIO1=D5, DIO2=D6
 };
 
-bool isJoined = false;
-bool ledState = false;
-unsigned long lastActionMs = 0;
-const unsigned long UPLINK_INTERVAL_MS = 15000; // ส่ง Uplink ทุกๆ 15 วินาที
-const unsigned long JOIN_RETRY_INTERVAL_MS = 10000; // พยายาม Join ใหม่ทุกๆ 10 วินาทีหากยังไม่ติด
+void do_send(osjob_t* j);
 
-void attemptJoin() {
-  Serial.println(F("----------------------------------------------------"));
-  Serial.print(F("[LoRaWAN] Sending Join-Request to ChirpStack (AS923)... "));
-  
-  // LoRaWAN 1.0.x (Device Profile Cytron): ต้องส่ง NULL ในพารามิเตอร์ nwkKey
-  node.beginOTAA(joinEUI, devEUI, NULL, appKey);
+void onEvent (ev_t ev) {
+    Serial.print(os_getTime());
+    Serial.print(F(": "));
+    switch(ev) {
+        case EV_SCAN_TIMEOUT:
+            Serial.println(F("EV_SCAN_TIMEOUT"));
+            break;
+        case EV_BEACON_FOUND:
+            Serial.println(F("EV_BEACON_FOUND"));
+            break;
+        case EV_BEACON_MISSED:
+            Serial.println(F("EV_BEACON_MISSED"));
+            break;
+        case EV_BEACON_TRACKED:
+            Serial.println(F("EV_BEACON_TRACKED"));
+            break;
+        case EV_JOINING:
+            Serial.println(F("[LoRaWAN] >>> EV_JOINING: กำลังส่ง Join-Request ไปยัง ChirpStack... <<<"));
+            break;
+        case EV_JOINED:
+            Serial.println(F("\n========================================================"));
+            Serial.println(F(" [LoRaWAN] >>> EV_JOINED: เชื่อมต่อ ChirpStack สำเร็จแล้ว! <<<"));
+            Serial.println(F("========================================================"));
+            {
+              u4_t netid = 0;
+              devaddr_t devaddr = 0;
+              u1_t nwkKey[16];
+              u1_t artKey[16];
+              LMIC_getSessionKeys(&netid, &devaddr, nwkKey, artKey);
+              Serial.print(F("Device Address (DevAddr): 0x"));
+              Serial.println(devaddr, HEX);
+            }
+            // ปิดการเช็ก validation link ในการทดสอบ
+            LMIC_setLinkCheckMode(0);
+            break;
+        case EV_JOIN_FAILED:
+            Serial.println(F("[LoRaWAN] EV_JOIN_FAILED: เชื่อมต่อไม่สำเร็จ กรุณาเช็กความถี่หรือเสาอากาศ"));
+            break;
+        case EV_REJOIN_FAILED:
+            Serial.println(F("[LoRaWAN] EV_REJOIN_FAILED"));
+            break;
+        case EV_TXCOMPLETE:
+            Serial.println(F("[LoRaWAN] EV_TXCOMPLETE: ส่งข้อมูลสำเร็จ (รอรับ Downlink เรียบร้อย)"));
+            if (LMIC.txrxFlags & TXRX_ACK) {
+              Serial.println(F("[LoRaWAN] ได้รับ ACK จาก Gateway"));
+            }
+            // ตรวจสอบหากมี Downlink ส่งมาจาก AI Chat box หรือ Web Dashboard
+            if (LMIC.dataLen) {
+              Serial.print(F("[LoRaWAN] ได้รับ Downlink: "));
+              Serial.print(LMIC.dataLen);
+              Serial.print(F(" bytes | ข้อมูล: 0x"));
+              
+              uint8_t cmdByte = LMIC.frame[LMIC.dataBeg];
+              if (cmdByte < 0x10) Serial.print('0');
+              Serial.println(cmdByte, HEX);
 
-  int state = node.activateOTAA();
-  if (state == RADIOLIB_LORAWAN_NEW_SESSION || state == RADIOLIB_ERR_NONE) {
-    isJoined = true;
-    Serial.println(F("\n>>> [LoRaWAN] JOINED SUCCESSFULLY! เข้าสู่เครือข่ายสำเร็จ <<<"));
-  } else {
-    isJoined = false;
-    Serial.print(F("FAILED, Error Code: "));
-    Serial.println(state);
-
-    if (state == -1109 || state == -706 || state == -6) {
-      Serial.println(F(">> คำแนะนำการแก้ปัญหา:"));
-      Serial.println(F("   1. ตรวจสอบว่าบอร์ด LoRa Shield เสียบ Jumper เชื่อมระหว่างขา DIO1 กับ D6 หรือไม่"));
-      Serial.println(F("   2. ตรวจสอบว่าเสาอากาศ LoRa ขันแน่นดีหรือไม่"));
-      Serial.println(F("   3. ใน ChirpStack: ตรวจสอบหน้า Live Device Data ว่ามี JoinRequest วิ่งเข้ามาหรือไม่"));
-      Serial.println(F("   4. หาก ChirpStack ไม่เห็น ให้ลองสลับ devEUI เป็น 0xCD0D88064682B2D1ULL"));
+              // สั่งงานไฟ LED ขา D4
+              if (cmdByte == 0x01) {
+                ledState = true;
+                digitalWrite(PIN_NODE_LED, HIGH);
+                Serial.println(F("[Control] LED บนบอร์ด (Pin D4) -> ON (เปิดไฟ)"));
+              } else if (cmdByte == 0x00) {
+                ledState = false;
+                digitalWrite(PIN_NODE_LED, LOW);
+                Serial.println(F("[Control] LED บนบอร์ด (Pin D4) -> OFF (ปิดไฟ)"));
+              }
+            }
+            // กำหนดรอบการส่งข้อมูลครั้งถัดไป
+            os_setTimedCallback(&sendjob, os_getTime() + sec2osticks(TX_INTERVAL), do_send);
+            break;
+        case EV_LOST_TSYNC:
+            Serial.println(F("EV_LOST_TSYNC"));
+            break;
+        case EV_RESET:
+            Serial.println(F("EV_RESET"));
+            break;
+        case EV_RXCOMPLETE:
+            Serial.println(F("EV_RXCOMPLETE"));
+            break;
+        case EV_LINK_DEAD:
+            Serial.println(F("EV_LINK_DEAD"));
+            break;
+        case EV_LINK_ALIVE:
+            Serial.println(F("EV_LINK_ALIVE"));
+            break;
+        case EV_TXSTART:
+            Serial.println(F("[LoRaWAN] EV_TXSTART: กำลังส่งสัญญาณออกอากาศ RF..."));
+            break;
+        case EV_TXCANCELED:
+            Serial.println(F("EV_TXCANCELED"));
+            break;
+        case EV_JOIN_TXCOMPLETE:
+            Serial.println(F("[LoRaWAN] EV_JOIN_TXCOMPLETE: ส่งคำขอ Join แล้ว (กำลังรอรับ Join-Accept จาก Server)..."));
+            break;
+        default:
+            Serial.print(F("Event อื่นๆ: "));
+            Serial.println((unsigned) ev);
+            break;
     }
-  }
-  Serial.println(F("----------------------------------------------------"));
+}
+
+void do_send(osjob_t* j){
+    // ตรวจสอบว่าไม่มีงานส่งเดิมค้างอยู่
+    if (LMIC.opmode & OP_TXRXPEND) {
+        Serial.println(F("OP_TXRXPEND: กำลังรอดำเนินการส่ง ไม่สามารถส่งซ้ำได้"));
+    } else {
+        if (TEST_MODE_ONLY) {
+            // โหมดทดสอบการเชื่อมต่อ: ส่งข้อความ Hello ยืนยันการเชื่อมต่อ
+            static uint8_t testPayload[] = "Hello ChirpStack";
+            LMIC_setTxData2(1, testPayload, sizeof(testPayload) - 1, 0);
+            Serial.println(F("[Uplink] สั่งส่งข้อมูลทดสอบ 'Hello ChirpStack' เข้าคิวแล้ว..."));
+        } else {
+            // โหมดทำงานจริง: อ่านค่าจากเซนเซอร์ LDR ส่ง 4 Bytes
+            uint16_t lightRaw = (uint16_t)analogRead(PIN_LIGHT_AO);
+            bool lightThresholdExceeded = (digitalRead(PIN_LIGHT_DO) == LOW);
+
+            uint8_t sensorPayload[4];
+            sensorPayload[0] = (uint8_t)((lightRaw >> 8) & 0xFF);
+            sensorPayload[1] = (uint8_t)(lightRaw & 0xFF);
+            sensorPayload[2] = lightThresholdExceeded ? 0x01 : 0x00;
+            sensorPayload[3] = ledState ? 0x01 : 0x00;
+
+            float brightnessPercent = ((1023.0 - (float)lightRaw) / 1023.0) * 100.0;
+            if (brightnessPercent < 0) brightnessPercent = 0;
+            if (brightnessPercent > 100) brightnessPercent = 100;
+
+            Serial.print(F("[Sensors] Light AO(A0)="));
+            Serial.print(lightRaw);
+            Serial.print(F(" ("));
+            Serial.print(brightnessPercent, 1);
+            Serial.print(F("%) | DO(D3)="));
+            Serial.print(lightThresholdExceeded ? F("BRIGHT") : F("DARK"));
+            Serial.print(F(" | LED(D4)="));
+            Serial.println(ledState ? F("ON") : F("OFF"));
+
+            LMIC_setTxData2(1, sensorPayload, sizeof(sensorPayload), 0);
+            Serial.println(F("[Uplink] สั่งส่งแพ็กเกจเซนเซอร์ 4 Bytes เข้าคิวแล้ว..."));
+        }
+    }
 }
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial && millis() < 3000) {}
+    Serial.begin(115200);
+    while (!Serial && millis() < 3000) {}
 
-  pinMode(PIN_LIGHT_AO, INPUT);
-  pinMode(PIN_LIGHT_DO, INPUT);
-  pinMode(PIN_NODE_LED, OUTPUT);
-  digitalWrite(PIN_NODE_LED, LOW);
+    pinMode(PIN_NODE_LED, OUTPUT);
+    digitalWrite(PIN_NODE_LED, LOW);
+    pinMode(PIN_LIGHT_AO, INPUT);
+    pinMode(PIN_LIGHT_DO, INPUT);
 
-  Serial.println(F("===================================================="));
-  Serial.println(F(" Arduino UNO R4 + LoRa Shield (SX1276/RFM95) Start"));
-  Serial.println(F(" ChirpStack: lora.kmitl.ac.th | DevEUI: d1b2824606880dcd"));
-  Serial.println(F(" Pins: LDR AO=A0, DO=D5 | Node LED=D4"));
-  Serial.println(F("===================================================="));
+    Serial.println(F("========================================================"));
+    Serial.println(F(" Arduino UNO R4 + LoRa Shield (LMIC OTAA Connection Test)"));
+    Serial.println(F(" Target: lora.kmitl.ac.th (AS923 / SF12)"));
+    Serial.print(F(" Mode  : "));
+    Serial.println(TEST_MODE_ONLY ? F("TEST_MODE_ONLY (ส่งข้อความทดสอบการเชื่อมต่อ)") : F("SENSOR_MODE (ส่งค่า LDR)"));
+    Serial.println(F("========================================================"));
 
-  Serial.print(F("[SX1276] Initializing SPI & radio... "));
-  int state = radio.begin();
-  if (state != RADIOLIB_ERR_NONE) {
-    Serial.print(F("Failed, code: "));
-    Serial.println(state);
-    Serial.println(F("ตรวจไม่พบชิป SX1276 กรุณาตรวจสอบการเสียบ Shield บน Arduino"));
-    while (true) { delay(1000); }
-  }
-  Serial.println(F("OK!"));
+    // เริ่มต้นระบบ LMIC
+    os_init();
+    LMIC_reset();
 
-  // พยายาม Join ครั้งแรก
-  attemptJoin();
-}
+    // ตั้งค่าความถี่ AS923 ตามแล็บ (923.2 MHz / SF12)
+    LMIC_setupChannel(
+        0,
+        923200000,
+        DR_RANGE_MAP(DR_SF12, DR_SF7),
+        BAND_CENTI
+    );
+    LMIC_setDrTxpow(DR_SF12, 14);
 
-void sendSensorUplinkAndCheckDownlink() {
-  // 1. อ่านค่าเซนเซอร์วัดแสง LM393 LDR จากขา A0 และ D5
-  uint16_t lightRaw = (uint16_t)analogRead(PIN_LIGHT_AO);
-
-  // บนโมดูล LM393 LDR ส่วนใหญ่: ยิ่งสว่าง ค่า ADC ยิ่งน้อย (~30), ยิ่งมืด ค่า ADC ยิ่งมาก (~900)
-  // คำนวณเป็น % ความสว่าง: ยิ่งสว่าง ยิ่งใกล้ 100%
-  float brightnessPercent = ((1023.0 - (float)lightRaw) / 1023.0) * 100.0;
-  if (brightnessPercent < 0.0) brightnessPercent = 0.0;
-  if (brightnessPercent > 100.0) brightnessPercent = 100.0;
-
-  // ขา DO: เมื่อแสงสว่างเกินเกณฑ์ Trimpot โมดูลจะจ่าย LOW (0) และไฟ LED DO บนโมดูลจะติด
-  bool lightThresholdExceeded = (digitalRead(PIN_LIGHT_DO) == LOW);
-
-  // 2. จัดแพ็กเกจข้อมูล 4 Bytes สำหรับส่งขึ้น LoRaWAN
-  //    Byte 0: Light Raw MSB (Analog AO)
-  //    Byte 1: Light Raw LSB (Analog AO)
-  //    Byte 2: Light DO Digital (1 = สว่างเกินเกณฑ์ Trimpot, 0 = มืด)
-  //    Byte 3: LED State on D4 (1 = ON, 0 = OFF)
-  uint8_t uplinkPayload[4];
-  uplinkPayload[0] = (uint8_t)((lightRaw >> 8) & 0xFF);
-  uplinkPayload[1] = (uint8_t)(lightRaw & 0xFF);
-  uplinkPayload[2] = lightThresholdExceeded ? 0x01 : 0x00;
-  uplinkPayload[3] = ledState ? 0x01 : 0x00;
-
-  Serial.print(F("[Sensors] Light Raw(A0)="));
-  Serial.print(lightRaw);
-  Serial.print(F(" (ความสว่าง: "));
-  Serial.print(brightnessPercent, 1);
-  Serial.print(F("%) | DO(D5)="));
-  Serial.print(lightThresholdExceeded ? F("BRIGHT (สว่างเกินเกณฑ์)") : F("DARK (มืด)"));
-  Serial.print(F(" | LED(D4)="));
-  Serial.println(ledState ? F("ON") : F("OFF"));
-
-  // เตรียมบัฟเฟอร์รับข้อมูล Downlink จาก ChirpStack (เมื่อสั่งผ่าน AI Chat box หรือ Web Dashboard)
-  uint8_t downlinkPayload[16];
-  size_t downlinkLen = sizeof(downlinkPayload);
-
-  int state = node.sendReceive(uplinkPayload, sizeof(uplinkPayload), 1, downlinkPayload, &downlinkLen);
-
-  if (state == RADIOLIB_ERR_NONE || state > 0) {
-    Serial.println(F("[LoRaWAN] >>> Uplink transmitted & confirmed successfully <<<"));
-    if (downlinkLen > 0) {
-      Serial.print(F("[LoRaWAN] Received Downlink (len="));
-      Serial.print(downlinkLen);
-      Serial.print(F("): 0x"));
-      Serial.println(downlinkPayload[0], HEX);
-
-      if (downlinkPayload[0] == 0x01) {
-        ledState = true;
-        digitalWrite(PIN_NODE_LED, HIGH);
-        Serial.println(F("[Control] LoRa Node LED (D4) -> ON (เปิดไฟ)"));
-      } else if (downlinkPayload[0] == 0x00) {
-        ledState = false;
-        digitalWrite(PIN_NODE_LED, LOW);
-        Serial.println(F("[Control] LoRa Node LED (D4) -> OFF (ปิดไฟ)"));
-      }
-    }
-  } else {
-    Serial.print(F("[LoRaWAN] Transmission failed, code: "));
-    Serial.println(state);
-    if (state == RADIOLIB_ERR_NETWORK_NOT_JOINED) {
-      Serial.println(F("หลุดการเชื่อมต่อจาก LoRaWAN จะทำการ Join ใหม่อัตโนมัติ..."));
-      isJoined = false;
-    }
-  }
+    // เริ่มต้นคำสั่งส่งและ Join OTAA
+    do_send(&sendjob);
 }
 
 void loop() {
-  unsigned long now = millis();
-
-  if (!isJoined) {
-    // หากยัง Join ไม่สำเร็จ ให้พยายาม Join ทุกๆ 10 วินาที
-    if (now - lastActionMs >= JOIN_RETRY_INTERVAL_MS || lastActionMs == 0) {
-      lastActionMs = now;
-      attemptJoin();
-    }
-  } else {
-    // เมื่อ Join สำเร็จแล้ว ส่งข้อมูลเซนเซอร์ตามรอบเวลา
-    if (now - lastActionMs >= UPLINK_INTERVAL_MS) {
-      lastActionMs = now;
-      sendSensorUplinkAndCheckDownlink();
-    }
-  }
+    os_runloop_once();
 }
