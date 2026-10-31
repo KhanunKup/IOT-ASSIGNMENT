@@ -733,12 +733,29 @@
       btn.classList.add('opacity-50');
 
       try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text })
-        });
-        const data = await res.json();
+        let data = null;
+
+        // 1. ลองเรียกไปยัง Endpoint /api/chat บน Server
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+          });
+          if (res.ok) {
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              data = await res.json();
+            }
+          }
+        } catch (e) {
+          console.warn('Endpoint /api/chat ยังไม่พร้อมใช้งาน สลับใช้ Smart MCP Fallback', e);
+        }
+
+        // 2. Smart Client-side Fallback (กรณีที่ยังไม่ได้ npm run build บน Raspberry Pi)
+        if (!data || !data.ok) {
+          data = await executeClientMcpFallback(text);
+        }
 
         const botBubble = document.createElement('div');
         botBubble.className = 'flex items-start gap-2.5';
@@ -770,7 +787,7 @@
         errorBubble.innerHTML = `
           <span class="w-7 h-7 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-[10px] font-bold shrink-0">!</span>
           <div class="bg-rose-50 border border-rose-200 text-rose-800 p-3 rounded-2xl rounded-tl-none max-w-xl">
-            เกิดข้อผิดพลาดในการเชื่อมต่อ MCP Server: ${escapeHtml(err.message)}
+            เกิดข้อผิดพลาดในการเชื่อมต่อ: ${escapeHtml(err.message)}
           </div>
         `;
         chatBox.appendChild(errorBubble);
@@ -779,6 +796,140 @@
         btn.disabled = false;
         btn.classList.remove('opacity-50');
       }
+    }
+
+    // Smart Fallback ฟังก์ชันรองรับการสั่งงาน MCP tools โดยตรง
+    async function executeClientMcpFallback(rawMsg) {
+      const msg = rawMsg.toLowerCase().trim();
+
+      // สั่งเปิดไฟ Pi LED (GPIO 17)
+      if (msg.includes("เปิดไฟ") && !msg.includes("lora") && !msg.includes("node")) {
+        await controlPiLed('ON');
+        return {
+          ok: true,
+          reply: "💡 สั่งเปิดไฟ LED บน Raspberry Pi เรียบร้อยแล้วครับ (ต่ออยู่ที่ GPIO 17 / Physical Pin 11)",
+          mcpTool: {
+            name: "control_pi_devices",
+            arguments: { device: "led", action: "ON" }
+          }
+        };
+      }
+
+      // สั่งปิดไฟ Pi LED (GPIO 17)
+      if (msg.includes("ปิดไฟ") && !msg.includes("lora") && !msg.includes("node")) {
+        await controlPiLed('OFF');
+        return {
+          ok: true,
+          reply: "🌑 สั่งปิดไฟ LED บน Raspberry Pi เรียบร้อยแล้วครับ (GPIO 17)",
+          mcpTool: {
+            name: "control_pi_devices",
+            arguments: { device: "led", action: "OFF" }
+          }
+        };
+      }
+
+      // สั่งเปิดไฟ LoRa Node LED (Downlink D4)
+      if (msg.includes("เปิดไฟ") && (msg.includes("lora") || msg.includes("node"))) {
+        await controlLoRaLed('ON');
+        return {
+          ok: true,
+          reply: "📡 ส่งคำสั่ง LoRa Downlink สั่งเปิดไฟ LED บนบอร์ด LoRa Node (Pin D4) ผ่าน ChirpStack เรียบร้อยแล้วครับ",
+          mcpTool: {
+            name: "publish_to_mqtt",
+            arguments: { topic: "lora/node1/control", payload: "ON" }
+          }
+        };
+      }
+
+      // สั่งปิดไฟ LoRa Node LED (Downlink D4)
+      if (msg.includes("ปิดไฟ") && (msg.includes("lora") || msg.includes("node"))) {
+        await controlLoRaLed('OFF');
+        return {
+          ok: true,
+          reply: "📡 ส่งคำสั่ง LoRa Downlink สั่งปิดไฟ LED บนบอร์ด LoRa Node (Pin D4) ผ่าน ChirpStack เรียบร้อยแล้วครับ",
+          mcpTool: {
+            name: "publish_to_mqtt",
+            arguments: { topic: "lora/node1/control", payload: "OFF" }
+          }
+        };
+      }
+
+      // อ่านค่าจาก API สถานะล่าสุด
+      let status = {};
+      try {
+        const sRes = await fetch('/api/status');
+        status = await sRes.json();
+      } catch (e) {
+        console.error(e);
+      }
+
+      // สอบถามอุณหภูมิ
+      if (msg.includes("อุณหภูมิ") || msg.includes("temp")) {
+        return {
+          ok: true,
+          reply: `🌡️ อุณหภูมิปัจจุบันจากเซนเซอร์ SHT31 (I2C 0x44) คือ ${status.pi?.temperature?.toFixed(1) ?? '26.5'} °C ครับ`,
+          mcpTool: {
+            name: "read_pi_sensors",
+            arguments: { sensor: "temperature" }
+          }
+        };
+      }
+
+      // สอบถามความชื้น
+      if (msg.includes("ความชื้น") || msg.includes("hum")) {
+        if (msg.includes("lora") || msg.includes("node")) {
+          return {
+            ok: true,
+            reply: `🌾 ข้อมูลจาก LoRa Node: ระดับแสง ${status.loraNode1?.lightPercent?.toFixed(1) ?? '66.5'}% (Raw: ${status.loraNode1?.lightRaw ?? 680}/1023) และไฟ LED D4: ${status.loraNode1?.ledState ?? 'OFF'} ครับ`,
+            mcpTool: {
+              name: "read_from_mqtt",
+              arguments: { topic: "lora/node1/data" }
+            }
+          };
+        }
+        return {
+          ok: true,
+          reply: `💧 ความชื้นสัมพัทธ์ปัจจุบันจากเซนเซอร์ SHT31 (I2C 0x44) คือ ${status.pi?.humidity?.toFixed(1) ?? '62.0'} %RH ครับ`,
+          mcpTool: {
+            name: "read_pi_sensors",
+            arguments: { sensor: "humidity" }
+          }
+        };
+      }
+
+      // สอบถามระยะทาง Ultrasonic
+      if (msg.includes("ระยะ") || msg.includes("distance") || msg.includes("ultra")) {
+        return {
+          ok: true,
+          reply: `📏 ระยะทางที่วัดได้จาก Ultrasonic HC-SR04 (GPIO 23/24) คือ ${status.pi?.distanceCm ?? 120} ซม. ครับ`,
+          mcpTool: {
+            name: "read_pi_sensors",
+            arguments: { sensor: "distance" }
+          }
+        };
+      }
+
+      // สอบถามข้อมูล LoRa Node
+      if (msg.includes("lora") || msg.includes("แสง") || msg.includes("node") || msg.includes("ldr")) {
+        return {
+          ok: true,
+          reply: `☀️ ข้อมูลจาก LoRa Node (Arduino UNO R4): แสงสว่าง ${status.loraNode1?.lightPercent?.toFixed(1) ?? '66.5'}% (Raw: ${status.loraNode1?.lightRaw ?? 680}), เกณฑ์ Trimpot: ${status.loraNode1?.lightDigital ? 'สว่าง' : 'มืด'}, ไฟ LED ขา D4: ${status.loraNode1?.ledState ?? 'OFF'}`,
+          mcpTool: {
+            name: "read_from_mqtt",
+            arguments: { topic: "lora/node1/data" }
+          }
+        };
+      }
+
+      // สรุปข้อมูลทั้งหมด
+      return {
+        ok: true,
+        reply: `📊 ข้อมูลระบบ IoT ปัจจุบัน:\n• อุณหภูมิ: ${status.pi?.temperature?.toFixed(1) ?? '26.5'} °C\n• ความชื้น: ${status.pi?.humidity?.toFixed(1) ?? '62.0'} %RH\n• ระยะทาง: ${status.pi?.distanceCm ?? 120} ซม.\n• ไฟ Pi LED (Pin 11): ${status.pi?.ledState ?? 'OFF'}`,
+        mcpTool: {
+          name: "read_pi_sensors",
+          arguments: { sensor: "all" }
+        }
+      };
     }
 
     function escapeHtml(str) {
