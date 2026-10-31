@@ -36,15 +36,18 @@ bool ledState = false;
 // ----------------------------------------------------------------------------
 // 2. กุญแจ OTAA จาก ChirpStack (Little-endian สำหรับ APPEUI & DEVEUI)
 // ----------------------------------------------------------------------------
-// APPEUI / JoinEUI: 0c8badd9567b322f (Little-endian: LSB first)
-static const u1_t PROGMEM APPEUI[8] = { 0x0C, 0x8B, 0xAD, 0xD9, 0x56, 0x7B, 0x32, 0x2F };
+// APPEUI / JoinEUI: ใน ChirpStack คือ 0c8badd9567b322f
+// LMIC ต้องใช้แบบ Little-endian (LSB first) จึงต้องกลับด้านไบต์:
+static const u1_t PROGMEM APPEUI[8] = { 0x2F, 0x32, 0x7B, 0x56, 0xD9, 0xAD, 0x8B, 0x0C };
+// (หมายเหตุ: หากหน้า ChirpStack กรอกแบบ LSB ไว้อยู่แล้ว ให้สลับมาใช้: { 0x0C, 0x8B, 0xAD, 0xD9, 0x56, 0x7B, 0x32, 0x2F })
 void os_getArtEui (u1_t* buf) { memcpy_P(buf, APPEUI, 8); }
 
-// DEVEUI: cd0d88064682b2d1 (Little-endian: LSB first)
+// DEVEUI: ใน ChirpStack คือ d1b2824606880dcd
+// LMIC ต้องใช้แบบ Little-endian (LSB first) กลับด้านเป็น cd0d88064682b2d1:
 static const u1_t PROGMEM DEVEUI[8] = { 0xCD, 0x0D, 0x88, 0x06, 0x46, 0x82, 0xB2, 0xD1 };
 void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8); }
 
-// APPKEY: 7d3488d5f6b4d4159ac69658df468716 (Big-endian: MSB first)
+// APPKEY: 7d3488d5f6b4d4159ac69658df468716 (Big-endian: MSB first ตามที่แสดงใน ChirpStack)
 static const u1_t PROGMEM APPKEY[16] = { 0x7D, 0x34, 0x88, 0xD5, 0xF6, 0xB4, 0xD4, 0x15, 0x9A, 0xC6, 0x96, 0x58, 0xDF, 0x46, 0x87, 0x16 };
 void os_getDevKey (u1_t* buf) { memcpy_P(buf, APPKEY, 16); }
 
@@ -222,6 +225,9 @@ void setup() {
     // เริ่มต้นระบบ LMIC
     os_init();
     LMIC_reset();
+
+    // ขยาย Receive Window สำหรับบอร์ด ARM/Renesas (Arduino UNO R4) ป้องกัน Clock Drift
+    LMIC_setClockError(MAX_CLOCK_ERROR * 10 / 100);
 
     // ตั้งค่าความถี่ AS923 ตามแล็บ (923.2 MHz / SF12)
     LMIC_setupChannel(

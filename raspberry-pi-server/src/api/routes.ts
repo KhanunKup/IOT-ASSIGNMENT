@@ -1,6 +1,7 @@
 import { Express, Request, Response } from "express";
 import { CONFIG } from "../config";
 import { setPiLedState } from "../hardware/led";
+import { executeMcpTool } from "../mcp/mcpServer";
 import {
   publishToMqtt,
   sendLoRaDownlinkLed,
@@ -132,6 +133,185 @@ export function mountApiRoutes(app: Express): void {
       ok: true,
       loraNode1: systemState.loraNode1,
     });
+  });
+
+  /**
+   * POST /api/chat
+   * AI Chat Box endpoint for natural language queries connecting to MCP Tools
+   * Body: { message: string }
+   */
+  app.post("/api/chat", async (req: Request, res: Response) => {
+    const rawMsg = String(req.body?.message || "").trim();
+    const msg = rawMsg.toLowerCase();
+
+    let toolName = "";
+    let toolArgs: Record<string, unknown> = {};
+    let friendlyReply = "";
+
+    try {
+      // 1. Control Pi LED (เปิด/ปิดไฟห้องเรียน หรือบอร์ด Pi)
+      if (
+        msg.includes("เปิดไฟ") &&
+        !msg.includes("lora") &&
+        !msg.includes("node")
+      ) {
+        toolName = "control_pi_devices";
+        toolArgs = { device: "led", action: "ON" };
+        const result = await executeMcpTool(toolName, toolArgs);
+        friendlyReply = `💡 สั่งเปิดไฟ LED บน Raspberry Pi เรียบร้อยแล้วครับ (GPIO 17 / Physical Pin 11)`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      if (
+        msg.includes("ปิดไฟ") &&
+        !msg.includes("lora") &&
+        !msg.includes("node")
+      ) {
+        toolName = "control_pi_devices";
+        toolArgs = { device: "led", action: "OFF" };
+        const result = await executeMcpTool(toolName, toolArgs);
+        friendlyReply = `🌑 สั่งปิดไฟ LED บน Raspberry Pi เรียบร้อยแล้วครับ (GPIO 17)`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      // 2. Control LoRa Node LED (เปิด/ปิดไฟ LoRa Node ขา D4 ผ่าน Downlink)
+      if (
+        msg.includes("เปิดไฟ") &&
+        (msg.includes("lora") || msg.includes("node"))
+      ) {
+        toolName = "publish_to_mqtt";
+        toolArgs = { topic: CONFIG.topics.loraNode1Control, payload: "ON" };
+        const result = await executeMcpTool(toolName, toolArgs);
+        friendlyReply = `📡 ส่งคำสั่ง LoRa Downlink สั่งเปิดไฟ LED บนบอร์ด LoRa Node (Pin D4) ผ่าน ChirpStack เรียบร้อยแล้วครับ`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      if (
+        msg.includes("ปิดไฟ") &&
+        (msg.includes("lora") || msg.includes("node"))
+      ) {
+        toolName = "publish_to_mqtt";
+        toolArgs = { topic: CONFIG.topics.loraNode1Control, payload: "OFF" };
+        const result = await executeMcpTool(toolName, toolArgs);
+        friendlyReply = `📡 ส่งคำสั่ง LoRa Downlink สั่งปิดไฟ LED บนบอร์ด LoRa Node (Pin D4) ผ่าน ChirpStack เรียบร้อยแล้วครับ`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      // 3. Read Temperature
+      if (msg.includes("อุณหภูมิ") || msg.includes("temp")) {
+        toolName = "read_pi_sensors";
+        toolArgs = { sensor: "temperature" };
+        const result = (await executeMcpTool(toolName, toolArgs)) as any;
+        friendlyReply = `🌡️ อุณหภูมิปัจจุบันจากเซนเซอร์ SHT31 (I2C 0x44) คือ ${result.temperature_c} °C ครับ`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      // 4. Read Humidity
+      if (msg.includes("ความชื้น") || msg.includes("hum")) {
+        if (msg.includes("lora") || msg.includes("node")) {
+          toolName = "read_from_mqtt";
+          toolArgs = { topic: CONFIG.topics.loraNode1Data };
+          const result = (await executeMcpTool(toolName, toolArgs)) as any;
+          friendlyReply = `🌾 ข้อมูลจาก LoRa Node: ระดับแสง ${result.lora_node_data?.light_percent}% (Raw: ${result.lora_node_data?.light_raw_a0}/1023, สถานะ: ${result.lora_node_data?.light_status}) และไฟ LED: ${result.lora_node_data?.led_state_d4 ? "ON" : "OFF"} ครับ`;
+          return res.json({
+            ok: true,
+            query: rawMsg,
+            reply: friendlyReply,
+            mcpTool: { name: toolName, arguments: toolArgs, result },
+          });
+        } else {
+          toolName = "read_pi_sensors";
+          toolArgs = { sensor: "humidity" };
+          const result = (await executeMcpTool(toolName, toolArgs)) as any;
+          friendlyReply = `💧 ความชื้นสัมพัทธ์ปัจจุบันจากเซนเซอร์ SHT31 (I2C 0x44) คือ ${result.humidity_rh} %RH ครับ`;
+          return res.json({
+            ok: true,
+            query: rawMsg,
+            reply: friendlyReply,
+            mcpTool: { name: toolName, arguments: toolArgs, result },
+          });
+        }
+      }
+
+      // 5. Read Distance / Ultrasonic
+      if (
+        msg.includes("ระยะ") ||
+        msg.includes("distance") ||
+        msg.includes("ultra")
+      ) {
+        toolName = "read_pi_sensors";
+        toolArgs = { sensor: "distance" };
+        const result = (await executeMcpTool(toolName, toolArgs)) as any;
+        friendlyReply = `📏 ระยะทางที่วัดได้จาก Ultrasonic HC-SR04 (GPIO 23/24) คือ ${result.distance_cm} ซม. ครับ`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      // 6. Read LoRa Node / Light
+      if (
+        msg.includes("lora") ||
+        msg.includes("แสง") ||
+        msg.includes("node") ||
+        msg.includes("ldr")
+      ) {
+        toolName = "read_from_mqtt";
+        toolArgs = { topic: CONFIG.topics.loraNode1Data };
+        const result = (await executeMcpTool(toolName, toolArgs)) as any;
+        friendlyReply = `☀️ ข้อมูลจาก LoRa Node: แสงสว่าง ${result.lora_node_data?.light_percent}% (Raw: ${result.lora_node_data?.light_raw_a0}), เกณฑ์ Trimpot: ${result.lora_node_data?.light_status}, ไฟ LED ขา D4: ${result.lora_node_data?.led_state_d4 ? "ON" : "OFF"}`;
+        return res.json({
+          ok: true,
+          query: rawMsg,
+          reply: friendlyReply,
+          mcpTool: { name: toolName, arguments: toolArgs, result },
+        });
+      }
+
+      // 7. General Status / All Sensors / Dashboard
+      toolName = "read_pi_sensors";
+      toolArgs = { sensor: "all" };
+      const result = (await executeMcpTool(toolName, toolArgs)) as any;
+      friendlyReply = `📊 ข้อมูลระบบ IoT ปัจจุบัน:\n• อุณหภูมิ: ${result.temperature_c} °C\n• ความชื้น: ${result.humidity_rh} %RH\n• ระยะทาง: ${result.distance_cm} ซม.\n• สถานะไฟ Pi LED: ${result.led_state ? "ON" : "OFF"}`;
+      return res.json({
+        ok: true,
+        query: rawMsg,
+        reply: friendlyReply,
+        mcpTool: { name: toolName, arguments: toolArgs, result },
+      });
+    } catch (err) {
+      res.status(500).json({
+        ok: false,
+        error: (err as Error).message,
+      });
+    }
   });
 }
 

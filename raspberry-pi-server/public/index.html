@@ -195,6 +195,73 @@
       </section>
     </div>
 
+    <!-- AI Chat Box Section (Block 1 & 2: สั่งงานผ่าน AI Chat box เชื่อมต่อกับ MCP Server) -->
+    <section class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-5 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-indigo-500/20">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm border border-indigo-500/30">
+            AI
+          </div>
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Block 1 &bull; AI Chat box &amp; Block 2 &bull; MCP Server</span>
+            <h2 class="text-base font-bold text-white">AI Chat Box สั่งการและอ่านค่าด้วยภาษาธรรมชาติ</h2>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-300 font-mono text-[11px] border border-indigo-500/20">
+            Protocol: MCP (HTTP / SSE)
+          </span>
+        </div>
+      </div>
+
+      <!-- Chat History Box -->
+      <div id="aiChatBox" class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 h-64 overflow-y-auto space-y-3 mb-3 text-xs font-sans">
+        <!-- Initial Bot Greeting -->
+        <div class="flex items-start gap-2.5">
+          <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-[11px] font-bold shrink-0">AI</span>
+          <div class="bg-slate-900 border border-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-xl">
+            สวัสดีครับ! ผมคือ <strong>AI Assistant</strong> เชื่อมต่อกับบอร์ด Raspberry Pi 4 ผ่าน <strong>MCP Server</strong><br/>
+            คุณสามารถพิมพ์สั่งเปิด/ปิดไฟ หรือสอบถามค่าเซนเซอร์ตามตัวอย่างใน Assignment ได้เลยครับ:
+            <ul class="list-disc list-inside mt-1.5 space-y-0.5 text-indigo-300 text-[11px]">
+              <li>"เปิดไฟที่ห้องเรียน" หรือ "ปิดไฟที่ห้องเรียน" (ควบคุมไฟบน Pi GPIO 17)</li>
+              <li>"อุณหภูมิตอนนี้เท่าไหร่" หรือ "ความชื้นเท่าไหร่" (อ่านค่าจาก SHT31)</li>
+              <li>"ระยะทาง Ultrasonic เท่าไหร่" (อ่านค่าจาก HC-SR04)</li>
+              <li>"ค่าแสงจาก LoRa node" หรือ "เปิดไฟบน LoRa node" (อ่าน/สั่งงานผ่าน LoRaWAN Downlink)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Pills -->
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="text-[11px] text-slate-400">คำสั่งด่วน:</span>
+        <button onclick="sendQuickChat('เปิดไฟที่ห้องเรียน')" class="px-2.5 py-1 rounded-lg text-[11px] bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 transition">💡 เปิดไฟที่ห้องเรียน</button>
+        <button onclick="sendQuickChat('ปิดไฟที่ห้องเรียน')" class="px-2.5 py-1 rounded-lg text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">🌑 ปิดไฟที่ห้องเรียน</button>
+        <button onclick="sendQuickChat('อุณหภูมิและความชื้นตอนนี้เท่าไหร่')" class="px-2.5 py-1 rounded-lg text-[11px] bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 transition">🌡️ อุณหภูมิ &amp; ความชื้น</button>
+        <button onclick="sendQuickChat('ระยะทาง Ultrasonic')" class="px-2.5 py-1 rounded-lg text-[11px] bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 transition">📏 ระยะทาง Ultrasonic</button>
+        <button onclick="sendQuickChat('อ่านค่าจาก LoRa node')" class="px-2.5 py-1 rounded-lg text-[11px] bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition">☀️ ข้อมูล LoRa Node</button>
+        <button onclick="sendQuickChat('เปิดไฟบน LoRa node')" class="px-2.5 py-1 rounded-lg text-[11px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 transition">📡 เปิดไฟ LoRa Node</button>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form id="aiChatForm" onsubmit="handleChatSubmit(event)" class="flex gap-2">
+        <input
+          id="chatInput"
+          type="text"
+          placeholder="พิมพ์คำสั่ง เช่น 'เปิดไฟห้องเรียน', 'อุณหภูมิเท่าไหร่', 'ขอดูค่าจาก LoRa node'..."
+          class="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
+        />
+        <button
+          type="submit"
+          id="btnSendChat"
+          class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5"
+        >
+          <span>ส่งคำสั่ง</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </form>
+    </section>
+
     <!-- Live Data Chart Section (Block 7) -->
     <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -449,6 +516,98 @@
         body: JSON.stringify({})
       });
       await fetchStatusAndHistory();
+    }
+
+    async function sendQuickChat(text) {
+      document.getElementById('chatInput').value = text;
+      await submitChatMessage(text);
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      await submitChatMessage(text);
+    }
+
+    async function submitChatMessage(text) {
+      const chatBox = document.getElementById('aiChatBox');
+      const btn = document.getElementById('btnSendChat');
+      
+      // Append user bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'flex items-start justify-end gap-2.5';
+      userBubble.innerHTML = `
+        <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none max-w-xl">
+          ${escapeHtml(text)}
+        </div>
+        <span class="w-6 h-6 rounded-full bg-slate-700 text-slate-200 flex items-center justify-center text-[10px] font-bold shrink-0">You</span>
+      `;
+      chatBox.appendChild(userBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+
+        const botBubble = document.createElement('div');
+        botBubble.className = 'flex items-start gap-2.5';
+
+        let toolBadgeHtml = '';
+        if (data.mcpTool) {
+          toolBadgeHtml = `
+            <div class="mt-2 pt-2 border-t border-slate-800 text-[10px] font-mono">
+              <span class="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-semibold">⚡ MCP Tool: ${data.mcpTool.name}</span>
+              <pre class="mt-1 p-2 bg-slate-950 rounded text-slate-400 overflow-x-auto text-[10px]">${escapeHtml(JSON.stringify(data.mcpTool.arguments))}</pre>
+            </div>
+          `;
+        }
+
+        botBubble.innerHTML = `
+          <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-[11px] font-bold shrink-0">AI</span>
+          <div class="bg-slate-900 border border-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-xl">
+            <div class="whitespace-pre-line">${escapeHtml(data.reply || 'รับทราบคำสั่ง')}</div>
+            ${toolBadgeHtml}
+          </div>
+        `;
+        chatBox.appendChild(botBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        await fetchStatusAndHistory();
+      } catch (err) {
+        const errorBubble = document.createElement('div');
+        errorBubble.className = 'flex items-start gap-2.5';
+        errorBubble.innerHTML = `
+          <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-[11px] font-bold shrink-0">!</span>
+          <div class="bg-rose-950/40 border border-rose-900 text-rose-300 p-3 rounded-2xl rounded-tl-none max-w-xl">
+            เกิดข้อผิดพลาดในการเชื่อมต่อ: ${escapeHtml(err.message)}
+          </div>
+        `;
+        chatBox.appendChild(errorBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     fetchStatusAndHistory();
