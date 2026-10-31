@@ -46,5 +46,9 @@ export const CONFIG = {
     loraNode1Data: "lora/node1/data",
     loraNode1Control: "lora/node1/control",
   },
+
+  // Google Gemini API Configuration (Optional)
+  geminiApiKey: process.env.GEMINI_API_KEY || "",
+  geminiModel: process.env.GEMINI_MODEL || "gemini-1.5-flash",
 };
 

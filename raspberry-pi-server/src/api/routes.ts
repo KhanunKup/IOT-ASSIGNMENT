@@ -136,6 +136,193 @@ export function mountApiRoutes(app: Express): void {
   });
 
   /**
+   * Helper function to call Google Gemini API with Function Calling
+   * Maps Gemini tool calls directly to our 4 MCP Tools:
+   *   1. read_pi_sensors
+   *   2. control_pi_devices
+   *   3. read_from_mqtt
+   *   4. publish_to_mqtt
+   */
+  async function callGeminiWithTools(userPrompt: string): Promise<{
+    reply: string;
+    mcpTool?: { name: string; arguments: Record<string, unknown>; result: unknown };
+  } | null> {
+    if (!CONFIG.geminiApiKey) return null;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.geminiModel}:generateContent?key=${CONFIG.geminiApiKey}`;
+
+    const geminiToolDeclarations = [
+      {
+        functionDeclarations: [
+          {
+            name: "read_pi_sensors",
+            description:
+              "อ่านค่าเซนเซอร์จาก Raspberry Pi 4 (อุณหภูมิและความชื้นจาก SHT31, ระยะทางจาก Ultrasonic HC-SR04, และสถานะไฟ LED บน GPIO 17)",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                sensor: {
+                  type: "STRING",
+                  enum: ["all", "temperature", "humidity", "distance", "led"],
+                  description: "เลือกเซนเซอร์ที่ต้องการอ่านค่า ('all' = ทั้งหมด)",
+                },
+              },
+            },
+          },
+          {
+            name: "control_pi_devices",
+            description:
+              "สั่งเปิด ปิด หรือสลับสถานะหลอดไฟ LED บนบอร์ด Raspberry Pi 4 (ต่ออยู่ที่ GPIO 17 / Physical Pin 11)",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                device: {
+                  type: "STRING",
+                  enum: ["led"],
+                  description: "อุปกรณ์ที่ต้องการควบคุม ('led')",
+                },
+                action: {
+                  type: "STRING",
+                  enum: ["ON", "OFF", "TOGGLE"],
+                  description: "คำสั่งเปิด/ปิด/สลับสถานะไฟ",
+                },
+              },
+              required: ["action"],
+            },
+          },
+          {
+            name: "read_from_mqtt",
+            description:
+              "อ่านข้อมูลเซนเซอร์จาก LoRa Node (Arduino UNO R4: เซนเซอร์วัดแสง LM393 LDR บนขา A0/D3 และไฟ LED บนขา D4) หรือข้อมูลจาก MQTT Broker",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                topic: {
+                  type: "STRING",
+                  description: "Topic ที่ต้องการอ่าน เช่น 'lora/node1/data' หรือ 'all'",
+                },
+              },
+            },
+          },
+          {
+            name: "publish_to_mqtt",
+            description:
+              "ส่งคำสั่งเปิด/ปิดไฟ LED บนบอร์ด LoRa Node (Pin D4) ผ่าน LoRaWAN Downlink ของ ChirpStack หรือส่งข้อความเข้า MQTT Broker",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                topic: {
+                  type: "STRING",
+                  description: "Topic เช่น 'lora/node1/control'",
+                },
+                payload: {
+                  type: "STRING",
+                  enum: ["ON", "OFF", "TOGGLE"],
+                  description: "คำสั่งเปิดหรือปิด ('ON' หรือ 'OFF')",
+                },
+              },
+              required: ["topic", "payload"],
+            },
+          },
+        ],
+      },
+    ];
+
+    const contents: any[] = [
+      {
+        role: "user",
+        parts: [{ text: userPrompt }],
+      },
+    ];
+
+    const systemInstruction = {
+      parts: [
+        {
+          text: "คุณคือ AI Assistant ประจำระบบ IoT ทำหน้าที่ควบคุมและอ่านค่าเซนเซอร์บน Raspberry Pi 4 และ LoRa Node (Arduino UNO R4) จงเลือกใช้ฟังก์ชัน (Function Call) ที่เหมาะสมกับสิ่งที่ผู้ใช้ต้องการ และตอบกลับด้วยภาษาไทยที่เป็นมิตร สุภาพ และกระชับ",
+        },
+      ],
+    };
+
+    const response1 = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents,
+        systemInstruction,
+        tools: geminiToolDeclarations,
+        generationConfig: { temperature: 0.2 },
+      }),
+    });
+
+    if (!response1.ok) {
+      console.warn("[Gemini API Error]:", await response1.text());
+      return null;
+    }
+
+    const resJson1 = (await response1.json()) as any;
+    const candidate = resJson1.candidates?.[0];
+    const functionCall = candidate?.content?.parts?.find(
+      (p: any) => p.functionCall
+    )?.functionCall;
+
+    // กรณีที่ Gemini ต้องการเรียก Tool
+    if (functionCall) {
+      const toolName = functionCall.name;
+      const toolArgs = functionCall.args || {};
+      console.log(`[Gemini Function Call]: ${toolName}`, toolArgs);
+
+      const toolResult = await executeMcpTool(toolName, toolArgs);
+
+      // ส่งผลลัพธ์ของ Tool กลับไปให้ Gemini เพื่อสร้างข้อความตอบกลับภาษาธรรมชาติ
+      contents.push(candidate.content);
+      contents.push({
+        role: "function",
+        parts: [
+          {
+            functionResponse: {
+              name: toolName,
+              response: { output: toolResult },
+            },
+          },
+        ],
+      });
+
+      const response2 = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          systemInstruction,
+          tools: geminiToolDeclarations,
+          generationConfig: { temperature: 0.3 },
+        }),
+      });
+
+      if (response2.ok) {
+        const resJson2 = (await response2.json()) as any;
+        const finalReply =
+          resJson2.candidates?.[0]?.content?.parts?.[0]?.text || "ดำเนินการเรียบร้อยครับ";
+        return {
+          reply: finalReply.trim(),
+          mcpTool: {
+            name: toolName,
+            arguments: toolArgs,
+            result: toolResult,
+          },
+        };
+      }
+    }
+
+    // กรณีที่ Gemini ตอบเป็นข้อความสนทนาทั่วไป
+    const textReply = candidate?.content?.parts?.[0]?.text;
+    if (textReply) {
+      return { reply: textReply.trim() };
+    }
+
+    return null;
+  }
+
+  /**
    * POST /api/chat
    * AI Chat Box endpoint for natural language queries connecting to MCP Tools
    * Body: { message: string }
@@ -149,6 +336,24 @@ export function mountApiRoutes(app: Express): void {
     let friendlyReply = "";
 
     try {
+      // 0. หากมีการตั้งค่า GEMINI_API_KEY ให้เรียกใช้ Google Gemini Function Calling ทันที!
+      if (CONFIG.geminiApiKey) {
+        try {
+          const geminiResult = await callGeminiWithTools(rawMsg);
+          if (geminiResult) {
+            return res.json({
+              ok: true,
+              query: rawMsg,
+              reply: geminiResult.reply,
+              mcpTool: geminiResult.mcpTool,
+              engine: `Google Gemini (${CONFIG.geminiModel})`,
+            });
+          }
+        } catch (e) {
+          console.warn("[Gemini Error Fallback]:", e);
+        }
+      }
+
       // 1. Control Pi LED (เปิด/ปิดไฟห้องเรียน หรือบอร์ด Pi)
       if (
         msg.includes("เปิดไฟ") &&
