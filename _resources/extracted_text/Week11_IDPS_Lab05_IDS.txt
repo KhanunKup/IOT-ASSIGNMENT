@@ -1,0 +1,327 @@
+--- PAGE 1 ---
+94
+Week 10-11
+Lecture (W10) - IDPS (Ref: NIST SP 800-94)
+Lab 5 (W11) - IDS
+06016421 IT Infrastructure Security
+by P . Sumet, IT/KMITL
+IDPS Technologies - Typical Components (P .23/127)
+● Sensor or Agent
+○ Monitor and Analyze activity
+○ Sensor : used for IDPSs monitoring networks, including network-based, wireless, and network behavior analysis 
+technologies.
+○ Agent : used for host-based IDPS technologies. 
+● Management Server
+○ A centralized device receiving information from the sensors or agents and manages them. Some management 
+servers perform event analysis identiﬁcation.
+○ Matching event information from multiple sensors or agents, such as ﬁnding events triggered by the same IP 
+address, is known as correlation.
+○ Available as both appliance and software-only products.
+● Database Server
+○ A repository for event information recorded by sensors, agents, and/or management servers.
+○ Many IDPSs provide support for database servers. 
+● Console
+○ A program providing an interface for the IDPS’s users and administrators. Console software is typically installed 
+onto standard desktop or laptop computers. Some consoles are used for IDPS administration only, such as 
+conﬁguring sensors or agents and applying software updates, while other consoles are used strictly for 
+monitoring and analysis. Some IDPS consoles provide both administration and monitoring capabilities.
+95
+(Reference : https://csrc.nist.gov/pubs/sp/800/94/ﬁnal  )
+
+--- PAGE 2 ---
+IDPS Technologies - Network Architecture (P .23/127)
+All components may be designed to connect via either Out-of-Band or InBand chennel.
+● Isolated management network (Out-of-Band)
+○ Each sensor/agent host has an additional network interface (i.e., management interface) connecting to management network.
+○ Each sensor/agent host is unable to pass any traﬃc between them.
+○ Management servers, database servers, and consoles are attached to the management network only. 
+○ Effectively isolates the management network from the production networks.
+○ Advantages
+■ To conceal the existence and identity of the IDPS from attackers;
+■ To protect the IDPS from attack; 
+■ To ensure that the IDPS has adequate bandwidth to function under adverse conditions
+○ DisadvantagesA
+■ Additional costs in networking equipment and other hardware (e.g., PCs for the consoles)
+■ Inconvenience for IDPS administrators of using separate computers for IDPS management and monitoring.
+● Mixed production network (InBand).
+○ If an IDPS is deployed without a separate management network, another way of improving IDPS security is to create a virtual 
+management network using a virtual local area network (VLAN) within the standard networks.
+○ Using a VLAN provides protection for IDPS communications, but not as much protection as a separate management network.
+○ For example, misconﬁguration of the VLAN could lead to the exposure of IDPS data.
+○ Another concern is that under adverse conditions, such as DDoS attacks or major malware incidents, the network devices 
+shared by the organization’s primary networks and VLAN might become completely saturated, negatively impacting the 
+availability and performance of the IDPS.
+96
+IDPS Technologies - Security Capabilities (P .24/127)
+Information Gathering Capabilities
+Logging Capabilities
+Detection Capabilities
+- Thresholds
+- Blacklists and Whitelists
+- Alert Setting
+- Most IDPS technologies allow administrators to customize each alert type.
+- Examples of actions that can be performed on an alert type include the following: 
+- Toggling it on or off
+- Setting a default priority or severity level
+- Specifying what information should be recorded and what notiﬁcation methods (e.g., e-mail, pager) should be used
+- Specifying which prevention capabilities should be used.  
+- Code Viewing and Editing
+- Some IDPS technologies permit administrators to see some or all of the detection-related code. This is usually limited to 
+signatures, but some technologies allow administrators to see additional code, such as programs used to perform stateful 
+protocol analysis.
+Prevention Capabilities 
+- Multiple prevention capabilities; the speciﬁc capabilities vary by IDPS technology type.
+- IDPSs usually allow administrators to specify the prevention capability conﬁguration for each type of alert.
+- Specifying which type of prevention capability should be used.
+- Allows administrators to monitor and ﬁne-tune the conﬁguration of the prevention capabilities before enabling 
+prevention actions, which reduces the risk of inadvertently blocking benign activity. 97
+
+--- PAGE 3 ---
+IDPS Technologies - Management (P .26/127)
+Architecture Design
+● Where the sensors or agents should be placed
+● How reliable it should be and what measures should be used to achieve that reliability
+○ such as having multiple sensors monitor the same activity in case a sensor fails, or using multiple 
+management servers so that a backup server can be used in case the primary server fails
+● Where the other components of the IDPS will be located (e.g., management servers, 
+database servers, consoles), and how many of each component are needed to achieve 
+the necessary usability, redundancy, and load balancing goals
+● With which other systems the IDPS needs to interface
+○ Systems to which it provides data, such as security information and event management software, 
+centralized log servers, e-mail servers, and paging systems
+○ Systems on which it initiates prevention responses (e.g., ﬁrewalls, routers, switches)
+○ Systems that manage IDPS components, such as network management software (for a management 
+network) or patch management software (for keeping consoles’ operating systems and applications fully 
+up-to-date)
+● Whether or not a management network will be used
+● What other security controls and technologies need to be altered to accommodate IDPS 
+deployment
+98
+IDPS Technologies - Management (2) (P .27/127)
+Component Testing and Deployment
+- ควร Test กอน Deploy ลง Production
+Securing IDPS Components
+- ควรแยก Account ตามหลัก Sepatation of Duties และใหสิทธิตาม Least Privilege
+- Access Control การเขา Conﬁg Mode ปองกันการเขาถึง Sensitive Info. ที่ถูกเก็บใน IDPS
+- Access Control ชองทางการสื่อสาร แตจะใหดีที่สุดคือใช OOB (ตองแลกกับ additional cost)
+Operation and Maintenance
+- Typical Use
+- Ongoing Solution Maintenance
+- Acquiring and Applying Updates : Software Updates and Signature Updates
+Building and Maintaining Skills
+- Vendor Training
+- Product Documentation
+- Technical Support
+- Professional Services
+- User Communities
+99
+
+--- PAGE 4 ---
+IDPS Technologies - Network-Based IDPS (P .36/127)
+Analysis Based on 4 TCP/IP Layers:
+● Application Layer
+● Transport Layer
+● Network Layer :
+○ Source IP Addresses
+○ Destination IP Addresses
+○ IP Protocol Number
+● Hardware Layer
+○ MAC Addresses
+100
+Typical Components
+● Appliance (i.e., specialized hardware+sensor software) 
+● Software Only
+Network Architectures and Sensor Locations (P .38/127)
+Inline 
+An inline sensor is deployed so that the network traﬃc it is 
+monitoring must pass through it, much like the traﬃc ﬂow 
+associated with a ﬁrewall.
+Passive
+A passive sensor is deployed so that it monitors a copy of actual 
+network traﬃc; no traﬃc actually passes through the sensor. 
+Passive sensors can monitor traﬃc through various methods, 
+including the following:
+1. Spanning Port
+2. Network Tap
+A direct connection between a sensor and the physical 
+network media itself, such as a ﬁber optic cable. The tap 
+provides the sensor with a copy of all network traﬃc being 
+carried by the media.
+3. IDS Load Balancer
+Send all traﬃc to multiple IDPS sensors
+Dynamically split the traﬃc among multiple IDPS sensors 
+based on volume.
+Split the traﬃc among multiple IDPS sensors based on IP 
+addresses, protocols, or other characteristics 101
+
+
+--- PAGE 5 ---
+Security Capabilities (P .41/127)
+Information Gathering Capabilities
+- Identifying Hosts, Operating Systems, Applications, and Network Characteristics
+Logging Capabilities
+- Timestamp (usually date and time)
+- Connection or session ID
+      - Typically a consecutive or unique number assigned to each TCP connection or to like groups of packets for
+         connectionless protocols)
+- Event or alert type
+- Rating (e.g., priority, severity, impact, conﬁdence)
+- Network, transport, and application layer protocols
+- Source and destination IP addresses
+- Source and destination TCP or UDP ports, or ICMP types and codes
+- Number of bytes transmitted over the connection
+- Decoded payload data, such as application requests and responses
+- State-related information (e.g., authenticated username)
+- Prevention action performed (if any)
+102
+Detection Capabilities (P .43/127)
+Application Layer Reconnaissance and Attacks 
+(e.g., banner grabbing, buffer overﬂows, format string attacks, password guessing, malware transmission)
+Most network-based IDPSs analyze several dozen application protocols. Commonly analyzed ones include DHCP , DNS, 
+Finger, FTP , HTTP , IMAP , IRC, NFS, POP , rlogin/rsh, RPC, SIP , SMB, SMTP , SNMP , Telnet, and TFTP , as well as database 
+protocols, IM applications, and P2P ﬁle sharing software. 
+Transport Layer Reconnaissance and Attacks (e.g., port scanning, unusual packet fragmentation, SYN ﬂoods)
+The most frequently analyzed transport layer protocols are TCP and UDP .
+Network Layer Reconnaissance and Attacks (e.g., spoofed IP addresses, illegal IP header values)
+The most frequently analyzed network layer protocols are IPv4, ICMP , and IGMP . Many products are also adding support for 
+IPv6 analysis.
+Unexpected Application Services (e.g., tunneled protocols, backdoors, hosts running unauthorized application services)
+Usually detected through stateful protocol analysis methods, which can determine if the activity in a connection is 
+consistent with the expected application protocol, or through anomaly detection methods, which can identify changes in 
+network ﬂows and open ports on hosts.
+Policy Violations (e.g., use of inappropriate Web sites, use of forbidden application protocols)
+Some types of security policy violations can be detected by IDPSs that allow administrators to specify the characteristics of 
+activity that should not be permitted, such as TCP or UDP port numbers, IP addresses, Web site names, and other pieces of 
+data that can be identiﬁed by examining network traﬃc.
+103
+
+--- PAGE 6 ---
+Prevention Capabilities (P .46/127)
+Passive Only
+Ending the Current TCP Session
+A passive sensor can attempt to end an existing TCP session by sending TCP reset packets to both endpoints; sometimes called session sniping. The sensor does this to 
+make it appear to each endpoint that the other endpoint is trying to end the connection. The goal is for one of the endpoints to terminate the connection before an attack 
+can succeed. Unfortunately, in many cases the reset packets are not received in time because the attack traﬃc has to be monitored and analyzed, the attack detected, and 
+the packets sent across networks to the endpoints. Also, since this technique is only applicable to TCP , it cannot be used for attacks carried in other types of packets, 
+including UDP and ICMP. Session sniping is not widely used any more because other, newer prevention capabilities are more effective.
+Inline Only
+Performing Inline Firewalling
+Most inline IDPS sensors offer ﬁrewall capabilities that can be used to drop or reject suspicious network activity.
+Throttling Bandwidth Usage
+If a particular protocol is being used inappropriately, such as for a DoS attack, malware distribution, or peer-to-peer ﬁle sharing, some inline IDPS sensors can limit the 
+percentage of network bandwidth that the protocol can use. This prevents the activity from negatively impacting bandwidth usage for other resources.
+Altering Malicious Content
+Some inline IDPS sensors can sanitize part of a packet, which means that malicious content is replaced with benign content and the sanitized packet sent to its destination. 
+A sensor that acts as a proxy might perform automatic normalization of all traﬃc, such as repackaging application payloads in new packets. This has the effect of 
+sanitizing some attacks involving packet headers and some application headers, whether or not the IDPS has detected an attack. Some sensors can also strip infected 
+attachments from e-mails and remove other discrete pieces of malicious content from network traﬃc.
+Both Passive and Inline
+Reconﬁguring Other Network Security Devices
+Many IDPS sensors can instruct network security devices, e.g., FWs, routers, and switches to reconﬁgure themselves to block certain types of activity or route it elsewhere.
+Running a Third-Party Program or Script
+Some IDPS sensors can run an administratorspeciﬁed script or program when certain malicious activity is detected. This could trigger any prevention action desired by the 
+administrator, such as reconﬁguring other security devices to block the malicious activity. Third-party programs or scripts are most commonly used when the IDPS does not 
+support the prevention actions that administrators want to have performed. 104
+Network-Based IDPS - Management
+Architecture Design
+A consideration speciﬁc to network-based IDPSs is where the sensors should be placed on the network, which includes deciding how many sensors 
+are needed, which sensors should be inline and which should be passive, and how passive sensors should be connected to the network (e.g., IDS load 
+balancer, network tap, switch spanning port).  
+Component Testing and Deployment
+Implementing a network-based IDPS can necessitate brief network outages, particularly when deploying inline sensors. However, passive sensor 
+deployment can also cause outages for several reasons, including installation of network taps and IDS load balancers, and reconﬁguration of switches 
+to activate spanning port functions.  
+Securing the IDPS Components
+Administrators should ensure that for both passive and inline sensors, IP addresses are not assigned to the network interfaces used to monitor 
+network traﬃc, except for network interfaces also used for IDPS management.
+Operating a sensor without IP addresses assigned to its monitoring interfaces is known as operating in stealth mode. Stealth mode improves the 
+security of the IDPS sensors because it prevents other hosts from initiating connections to them. This conceals the sensors from attackers and thus 
+limits their exposure to attacks.
+However, attackers may be able to identify the existence of an IDPS sensor and determine which product is in use by analyzing the characteristics of 
+its prevention actions. Such analysis might include monitoring protected networks, and determining which scan patterns trigger particular responses 
+and what values are set in certain packet header ﬁelds.
+105
+
+--- PAGE 7 ---
+Examples of IDPS in Practices
+Snort
+- https://www.snort.org/
+- https://github.com/snort3/snort3
+Suricata
+- https://suricata.io/
+- https://github.com/OISF/suricata
+106
+Snort3 Architecture
+Credit: Snort 3 and Me: An introduction and overview to Snort 3
+https://youtu.be/OYBje_JxZzE?si=Q_C4JTPmYr9MoYgn 
+107
+
+
+--- PAGE 8 ---
+Lab 5 : IDS
+Lab 5-A : Passive IDS for Ping and Remote Access Detections
+Lab 5-B : Passive IDS for Nmap Detection
+Lab 5-C : Passive IDS for DoS Detection
+Lab 5-D : Inline IDS for DoS Detection
+108
+เลือก  IDS ตามใจชอบ 
+- Snort
+- Suricata
+- …
+Lab 5-A : Passive IDS for Ping and Remote Access Detections 
+1. ติดตั้ง IDS ดังรูป คอนฟกและ Start IDS Service ใหตรวจ
+จับการ Ping แลวลองสั่ง Ping จาก Attacker ไป Web Server
+2. บันทึก IDS Rules และผลการ Detect จาก IDS
+3. คอนฟกและ Start IDS Service ใหตรวจจับการ Telnet และ 
+FTP แลวสั่ง Telnet และ FTP จาก Attacker ไป Web Server
+4. บันทึก IDS Rules และผลการ Detect จาก IDS
+5. อธิบายวาตองกําหนด IDS Rules อยางไรจึงจะสามารถ 
+Detect การ Ping และการ Remote Access ดังกลาวได
+6. อธิบายวิธีคอนฟก Network วาใชวิธีใดให IDS ไดรับ 
+Traﬃc มาทําการตรวจสอบ
+109
+
+
+--- PAGE 9 ---
+Lab 5-B : Passive IDS for Nmap Detection
+1. ติดตั้ง IDS ดังรูป คอนฟกและ Start IDS Service ใหตรวจจับ
+การทํา Port Scanning
+2. ให Observer ใช Iperf สราง Traﬃc ปกติ สงไป Web Server
+3. ให Attacker ทํา Port Scanning ไปยัง Web Server
+4. บันทึก IDS Rules และผลการ Detect จาก IDS
+5. อธิบายวาตองกําหนด IDS Rules อยางไรจึงจะสามารถ 
+Detect การทํา Port Scanning ได
+110
+Lab 5-C : Passive IDS for DoS Detection
+1. ติดตั้ง IDS ดังรูป คอนฟกและ Start IDS Service ใหจับ ICMP 
+Flood, UDP Flood, และ TCP SYN Flood
+2. ให Observer ใช Iperf สราง Traﬃc ปกติ สงไป Web Server
+3. ให Attacker ทําการ hping3 ไปยัง Web Server แบบ ICMP 
+Flood, UDP Flood, และ TCP SYN Flood
+4. บันทึก IDS Rules และผลการ Detect จาก IDS
+5. อธิบายวาตองกําหนด IDS Rules อยางไรจึงจะสามารถ 
+Detect แตละการโจมตีที่ทําการทดลองไปได
+6. ถาตองการใหเก็บผลลง Local Log File ตองทําอยางไร
+7. ถาตองการใหสงผลไป Centralized Log Server ตองทํา
+อยางไร
+111
+
+
+--- PAGE 10 ---
+คําถามทาย Lab 5
+ใหสรุปขั้นตอนการ Setup IDS เพื่อใหตรวจจับ Security Incident วามีกี่ขั้นตอนอะไรบาง 
+และใหอธิบายหลักการกําหนด IDS Rules พรอมยกตัวอยาง และให นศ เก็บเอกสารนี้ไว
+ตางหากเพราะอาจจะเปนเอกสารชิ้นเดียวที่จะอนุญาตใหนําเขาในการสอบภาคปฏิบัติได
+112
+Lab 5-D : Inline IDS for DoS Detection (Option)
+1. ติดตั้ง IDS ดังรูป คอนฟกและ Start IDS Service
+2. ให Observer ใช Iperf สราง Traﬃc ปกติ สงไป 
+Web Server
+3. ให Attacker ทําการ hping3 ไปยัง Web Server 
+แบบ ICMP Flood, UDP Flood, และ TCP SYN Flood
+4. บันทึก IDS Rules และผลการ Detect จาก IDS
+5. อธิบายวิธี Setup ทั้ง Network วาแตกตางจากแบบ 
+Passive IDS อยางไร
+113
+
+

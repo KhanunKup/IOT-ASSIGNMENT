@@ -68,6 +68,9 @@ async function startServer(): Promise<void> {
         CONFIG.simulateHardware ? "SIMULATION (Fallback Active)" : "REAL HARDWARE (I2C/GPIO)"
       }`
     );
+    console.log("------------------------------------------------------------");
+    console.log(` tunnl.gg Proxy : ssh -t -R 80:localhost:${CONFIG.port} proxy.tunnl.gg`);
+    console.log(` tunnl.gg Stable: ssh -t -R 80:localhost:${CONFIG.port} stable@proxy.tunnl.gg`);
     console.log("============================================================");
   });
 }

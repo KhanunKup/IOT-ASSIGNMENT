@@ -1,0 +1,398 @@
+--- PAGE 1 ---
+193
+Week 15 Cloud Security Standards and
+                Identity and Access Management (IAM)
+06016421 IT Infrastructure Security
+by P . Sumet, IT/KMITL
+Compliance Frameworks in Cloud Security
+● International Organization for Standardization (ISO)
+○ ISO 27001
+○ ISO 27017
+○ ISO 27018
+○ ISO 17788
+○ ISO 17789
+● NIST Cybersecurity Framework
+● CIS Controls ; CIS = Center for Internet Security
+● Federal Risk and Authorization Management Program (FedRAMP)
+● CSA Cloud Controls Matrix (CCM)
+● CSA Security, Trust, Assurance, and Risk (STAR)
+194
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+
+--- PAGE 2 ---
+ISO
+● ISO 27001
+○ Lays a foundation for creating and maintaining a robust security program in the cloud. It includes requirements and best 
+practices focusing on:
+■ Risk assessment
+■ Asset management
+■ Access control
+■ Incident response
+■ Continuous monitoring and review
+● ISO 27017 :
+○ This standard offers guidance for implementing security controls for cloud services. It emphasizes the distinct security 
+aspects and risks related to cloud services.
+● ISO 27018 :
+○ This standard offers guidance on safeguarding personal information in the cloud. This focuses on privacy concerns 
+associated with the information cloud service providers process.
+● ISO 17788 :
+○ This standard offers an overview of cloud computing terms and deﬁnitions. It helps businesses speak the language and 
+make well-informed choices about cloud adoption and security approaches.
+● ISO 17789 :
+○ This standard offers guidance on cloud service-level agreements (SLAs). It presents advice for creating SLAs between 
+cloud service providers and clients that clarify service security expectations, roles, and responsibilities. 195
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+NIST Cybersecurity Framework
+● Identify: Understand and manage cloud-related cybersecurity risks to guarantee compliance
+● Protect: Set up safety measures to guarantee the conﬁdentiality and availability of cloud 
+resources and data
+● Detect: Set up measures to spot cybersecurity events and irregularities
+● Respond: Draft and implement security incident response plans for issues in your cloud 
+infrastructure
+● Recover: Restore systems and data to normal status following a security incident. Understand 
+what happened and set up preventative measures.
+196
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+
+--- PAGE 3 ---
+CIS Controls
+● The Center for Internet Security (CIS) Controls are a collection of best 
+practices to help organizations improve their cybersecurity posture. While 
+they're not focused on cloud security, they’re often used to enhance security 
+and compliance in cloud settings.
+● The CIS Controls framework includes 18 main security controls. To determine 
+which of these is most relevant to your cloud environment (and how to 
+interpret and apply them), CIS provides a Cloud Companion Guide. Use this to 
+map out your controls, decide metrics for each control, and determine the 
+results you want. 
+197
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+Federal Risk and Authorization Management Program (FedRAMP)
+● Preparation:
+CSPs undergo a readiness assessment to determine if they’re ready to pursue FedRAMP 
+authorization.
+● Authorization:
+CSPs are given a thorough security review, which involves examining their cloud systems, 
+controls, and policies. They receive a provisional authorization to operate (P-ATO) or an 
+authorization to operate (ATO) based on the cloud service's risk level.
+● Continuous monitoring:
+CSPs must maintain their system with security measures such as vulnerability scans, 
+rapid incident solutions, and security event records. The CSP will undergo regular 
+evaluations.
+198
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+
+--- PAGE 4 ---
+Compliance Frameworks in Cloud Security
+● CSA Cloud Controls Matrix (CCM)
+○ The Cloud Security Alliance (CSA) Cloud Controls Matrix (CCM) v4.0 includes 197 control objectives and 
+related control requirements broken into 17 cloud security domains. It aligns with other standards, such as ISO 
+27001 and the NIST Cybersecurity Framework.
+○ Similar to the CIS controls, you can use the CSA CCM as a model and make a list of the requirements 
+speciﬁed. From there, you can determine how your organization will meet those requirements. The CSA also 
+has an implementation guide that can be useful to understand how to navigate these controls.
+● CSA Security, Trust, Assurance, and Risk (STAR)
+○ The Cloud Security Alliance STAR program helps organizations evaluate CSPs to make well-informed choices.
+○ As part of this program, a certifying body evaluates and reviews a CSP’s security methods. CSPs compliant 
+with popular security methods earn a STAR certiﬁcation. Looking for vendors with this certiﬁcation can 
+reassure you their cybersecurity methods are up to par.
+199
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+Security Guidance for Critical Areas of Focus in Cloud Computing v5
+CSA - Cloud Security Domains Covered:
+● Cloud Computing Concepts and Architectures
+● Cloud Governance
+● Risk, Audit, and Compliance
+● Organization Management
+● Identity and Access Management
+● Security Monitoring
+● Infrastructure and Networking
+● Cloud Workload Security
+● Data Security
+● Application Security
+● Incident Response and Resilience
+● Related Technologies and Strategies
+200
+Credit: https://cloudsecurityalliance.org/artifacts/security-guidance-v5 
+
+--- PAGE 5 ---
+Best practices for cloud security compliance
+● Train and educate employees
+● Identify the relevant compliance regulations
+○ Your teams need to know how to work in the cloud. But even more importantly, they need to 
+know how to work in the cloud securely. To comply with your organization’s chosen cloud 
+security framework(s), everyone working closely with the cloud should understand how to:
+■ Set up access controls
+■ Encrypt data
+■ Authenticate requests for data
+■ Safely move data to and from the cloud
+■ Handle protected user data
+■ Securely share data with authorized third parties
+■ Respond to security incidents
+● Develop an understandable cloud security policy
+201
+Credit: https://www.pluralsight.com/resources/blog/cloud/compliance-frameworks-for-cloud-security 
+NIST Cloud Security Standards
+● NIST cloud security refers to the standards, policies, and best practices put forward 
+by the NIST to eﬃciently manage cloud cyber security risks.
+● NIST standards concerning cloud security include: 
+○ NIST SP 800 – 144 : Key guidelines for maintaining security & privacy in public clouds.
+○ NIST SP 800 – 145 : Deﬁnes cloud computing, its characteristics, and its service & deployment models. 
+○ NIST SP 800 – 146 : Cloud systems along with when & how to use them are explained.
+○ NIST SP 800 – 53 : Provides security controls for NIST CSF implementation.
+○ NIST SP 800 – 210 : Provides access control guidance for different cloud delivery models. 
+○ NIST Cyber Security Framework : Provides guidelines to help reduce cybersecurity risks.
+○ NIST Cloud Computing Resources : Dedicated catalog for cloud computing resources.
+202
+Credit: https://www.getastra.com/blog/compliance/nist/nist-cloud-security/ 
+
+--- PAGE 6 ---
+Who Does NIST Cloud Security Apply To?
+● Frameworks, guidelines, and security controls put forward by NIST are ideal 
+for all companies having assets in the cloud. Most companies today have 
+multiple cloud assets in the form of data, applications or both, therefore 
+making implementation of the best cloud security measures integral.
+● Following NIST security controls such as NIST SP 800-53, NIST SP 800 -145, 
+and others ensures that security measures apt for your cloud assets are 
+applied for optimal protection. This usually includes risk assessments, data 
+encryption, installation of ﬁrewalls, and more.
+203
+Credit: https://www.getastra.com/blog/compliance/nist/nist-cloud-security/ 
+NIST SP 800–144
+Title – Guidelines on Security and Privacy in Public Cloud Computing
+The public cloud’s security and privacy challenges are addressed in the document. Recommendations for 
+organizations for data & application outsourcing to public cloud platforms. 
+NIST SP 800-144 is mainly geared toward decision-making executives, information oﬃcers, and system 
+managers. It also mentions an exhaustive list of other SP NIST publications that directly relate to cloud 
+computing and can be used in conjunction with NIST SP 800-144. 
+Key guidelines mentioned include: 
+● Planning of security and privacy components of cloud computing solutions carefully before 
+implementation. 
+● Detailed knowledge and understanding of the public cloud computing platform offered by the provider. 
+● The public cloud computing solution should satisfy the organizational security and privacy criteria. 
+● Accountability over the privacy and security of applications and data in the public cloud platform 
+should be maintained. 
+204
+Credit: https://www.nist.gov/publications/guidelines-security-and-privacy-public-cloud-computing 
+
+--- PAGE 7 ---
+NIST SP 800–145
+Title: The NIST Deﬁnition Of Cloud Computing
+The special publication deﬁnes cloud computing, its ﬁve essential characteristics, three service models, and four deployment models. 
+Broad comparisons of cloud services within the cloud are mentioned. 
+Service models include SaaS (software as a service),  PaaS (Platform as a service), and IaaS (Infrastructure as a service). Deployment 
+models for the cloud are private, community, public, and hybrid. 
+NIST Cloud Computing Deﬁnition
+Cloud computing is a model for enabling convenient, on-demand network access to a shared pool of conﬁgurable computing resources 
+like networks and applications that can be rapidly bought and used with minimal management effort or service provider interaction.
+NIST Vital Cloud Computing Characteristics
+● On-demand self-service: Users can provision cloud computing capacities based on unilateral requirements.  
+● Broad network access: Cloud capabilities are available over the network through daily-use devices like laptops and mobile phones. 
+● Resource pooling: Resources of the cloud platform serve multiple consumers dynamically according to their demand. 
+● Rapid elasticity: Cloud platforms provide a high level of resource scalability to meet user requirements. 
+● Measured service: Cloud platforms automatically control and optimize resource use with a pay-per-use policy. 
+205
+Credit: https://csrc.nist.gov/pubs/sp/800/145/final 
+NIST SP 800–146
+Title: Cloud Computing Synopsis and Recommendations
+Cloud systems are explained in the guide and suggestions for IT professionals are 
+provided. The standard mentions how and when cloud computing is ideal for an 
+organization. 
+NIST SP 800 – 146 explains different cloud deployments & technical 
+characteristics like cloud performance, reliability, and security concerns.
+206
+Credit: https://csrc.nist.gov/pubs/sp/800/146/final 
+
+--- PAGE 8 ---
+NIST SP 800–53
+Title: Security and Privacy Controls for Federal Information Systems and Organizations
+NIST SP 800–53 mentions speciﬁc security controls to implement NIST CSF for federal 
+organizations. Implementing the security controls is valuable for all organizations 
+however, it mainly targets federal compliance. 
+The security controls help determine the requirements for securing federal agencies with 
+various impact levels like low-impact, moderate-impact, and high-impact.
+The following security controls are relevant for organizations in the cloud: 
+● Access Control
+● Audit and Accountability
+● Conﬁguration Management
+● Identiﬁcation and Authentication
+● Risk Assessment
+● Incident Response
+207
+Credit: https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final 
+NIST SP 800–210
+Title: General Access Control Guidance for Cloud Systems
+This special publication was released to address appropriate access control 
+measures for different cloud delivery models such as: 
+● Infrastructure-as-a-Service (IaaS)
+● Platform-as-a-Service (PaaS)
+● Software-as-a-Service (SaaS)
+The document focuses on the technical features of access control without 
+considering the deployment model of the cloud (hybrid, private, public). It provides 
+access control guidance for various components of the cloud such as network, 
+data, APIs, and privilege management.
+208
+Credit: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-210.pdf 
+
+--- PAGE 9 ---
+NIST Cyber Security Framework
+The NIST Cyber Security Framework was introduced with the aim of reducing cybersecurity risks for 
+organizations of varied sectors and sizes. It does not provide speciﬁc security controls however which is 
+done through special publications. It enables easy customization of cybersecurity practices based on 
+individual company requirements.
+NIST 800-53 among other NIST special publications provide security controls for implementing NIST CSF. 
+It consists of three main components: 
+● Core: Set of high-level cybersecurity functions i.e. identify, protect, detect, respond, recover. 
+● Implementation Tiers: Various degrees to which NIST CSF has been implemented, partial, 
+risk-informed, repeatable, and adaptive.  
+● Proﬁles: Refers to each organization’s unique security requirements.
+209
+Credit: https://www.getastra.com/blog/security-audit/nist-security-audit/ 
+NIST Cloud Computing Resources
+NIST has created a dedicated webpage catalog for cloud computing resources which includes various publications, 
+documents, and guidelines related to cloud security. 
+Some of the NIST special publications mentioned in this include
+● Cloud Computing Security: Foundations and Challenges, Chapter 7, Managing Risk in the Cloud
+● Cloud Computing Security: Foundations and Challenges, Cloud Computing Security Essentials and Architecture
+210
+Credit: https://csrc.nist.gov/Projects/cloud-computing/publications 
+
+--- PAGE 10 ---
+NIST Cloud Security Best Practices
+1. Conduct regular vulnerability assessments 
+and penetration tests
+2. Install ﬁrewall & anti-malware software
+3. Encrypt data at rest and in transit
+4. Implement access management controls
+5. Have an incident response plan in place
+211
+Credit: https://www.getastra.com/blog/compliance/nist/nist-cloud-security/ 
+NIST Cloud Security Beneﬁts
+Key beneﬁts of following NIST’s cloud security guidelines and standards include:
+1. Robust and strong security posture in their cloud environments.
+2. Availability of tools and practices provided by NIST to identify and mitigate risks 
+associated with cloud adoption.
+3. Aids with regulatory compliance requirements in the cloud for various 
+compliances like SOC2, ISO 27001, PCI-DSS, and more.
+4. Provides best practices for increased cloud security and trust in its services.
+5. Emphasis on continuous monitoring for prompt detection and response to 
+security threats.
+6. NIST is adaptable for various types of cloud deployment be it public, private, 
+community, or hybrid.  
+7. Optimizes resource usage and cost-effectiveness in securing the cloud.
+212
+Credit: https://www.getastra.com/blog/compliance/nist/nist-cloud-security/ 
+
+--- PAGE 11 ---
+Conclusion for NIST Cloud Security
+● NIST cloud security resources like standards, frameworks, and resources are 
+invaluable in a landscape where cyber threats are a constant concern.
+● Implementing & following NIST’s cloud security best practices, and established 
+standards can signiﬁcantly enhance organizations’ cloud security posture & reap its 
+beneﬁts. 
+213
+Credit: https://www.getastra.com/blog/compliance/nist/nist-cloud-security/ 
+Cloud Security
+● ระบบรักษาความปลอดภัยที่จะคอยชวยปกปองขอมูล, แอปพลิเคชัน และโครงสรางระบบตาง ๆ ที่อยูบนคลาวด จากการโจมตี และภัยคุกคามทางไซเบอร
+● เทคโนโลยี, นโยบาย, การควบคุม และบริการ ที่มีไวเพื่อปกปองขอมูล, แอปพลิเคชัน, ซอฟตแวร หรือโครงสรางที่อยูบนคลาวด
+● เปนความรับผิดชอบรวมกันระหวางผูใหบริการ กับลูกคาที่เปนผูใชงาน โดยพื้นฐานแลวจะมีการแบงสวนที่ตองรับผิดชอบรวมกันออกเปน 3 หมวดหมูใหญ คือ 
+ความรับผิดชอบของฝงผูใหบริการ, ความรับผิดชอบของฝงผูใช และความรับผิดชอบที่ขึ้นอยูกับรูปแบบบริการ ที่ไดรับความนิยมก็จะมี Infrastructure as a 
+Service (IaaS), Platform as a Service (PaaS) และ Software as a Service (SaaS)
+○ ความรับผิดชอบของฝงผูใหบริการ
+■ เกี่ยวของกับระบบปองกันของตัวโครงสรางพื้นฐาน อยางเชน การเขาถึงตัวระบบ, การแพทชชองโหวดานความปลอดภัย, การตั้งคาโฮสต และ
+ระบบเน็ตเวิรค เปนตน
+○ ความรับผิดชอบของฝงผูใช
+■ จะเปนดานการบริหารจัดการดานบัญชีผูใช และสิทธิ์ในการเขาถึงสวนตาง ซึ่งจะตองมีระบบปองกันไมใหบัญชีที่ไมไดรับอนุญาตเขาถึงพื้นที่
+นอกเหนือสวนที่กําหนดสิทธิ์เอาไวได รวมไปถึงการเขารหัสขอมูล และขอกําหนดในการเขาใชงานตาง ๆ ดวย
+○ ความรับผิดชอบที่ขึ้นอยูกับรูปแบบบริการ
+■ IaaS (Infrastructure-as-a-Service)
+● เปนระบบแบบผสม (Hybrid) ที่ทางองคกรสามารถบริหารขอมูล และแอปพลิเคชันบางสวนภายในองคกรได โดยที่อาศัยผูใหบริการ
+คลาวดในสวนของการจัดการเซิรฟเวอร, ฮารดแวร, ระบบเครือขาย, ระบบจําลอง และพื้นที่เก็บขอมูลตามที่องคกรตองการ
+■ PaaS (Platform-as-a-Service)
+● เปนระบบที่ชวยเพิ่มความคลองตัวในการพัฒนาบริการ และแอปพลิเคชันขององคกร ดวยการใช Custom Application Framework 
+ที่สามารถบริหารระบบปฏิบัติการ, อัปเดตซอฟตแวร, พื้นที่เก็บขอมูล และโครงระบบที่อยูบนคลาวด
+■ SaaS (Software-as-a-Service)
+● เปนซอฟตแวรบนคลาวดที่โฮสตขอมูลเอาไวบนเซิรฟเวอร และมักจะมีคาใชจายเปนแบบรายเดือน หรือรายป โดยที่ผูใหบริการซึ่งเปน 
+3rd-Party จะคอยดูแลปญหาทางดานเทคนิคที่อาจจะเกิดขึ้นใหทั้งหมด เชน ขอมูล, Middleware, เซิรฟเวอร และพื้นที่เก็บขอมูล เพื่อ
+ลดภาระ และคาใชจายของทรัพยากรดานไอทีขององคกร และชวยเพิ่มความคลองตัวใหกับการบริหารขององคกรไดดวย
+214
+Credit: https://www.antivirus.in.th/tips/2316.html
+
+--- PAGE 12 ---
+How does Cloud Security work ?
+● โมเดลแบบแบงความรับผิดชอบรวมกัน (Shared Responsibility Model)
+○ เปน Framework ที่คอยตีกรอบวางานรักษาความปลอดภัยสวนไหนที่เปนความรับผิดชอบของผูใหบริการคลาวด และสวนไหนที่เปนความรับผิดชอบของทางลูกคา
+○ องคกรที่ใชบริการคลาวดควรจะตองมีความเขาใจถึงความรับผิดชอบของการรักษาความปลอดภัย วาสวนไหนที่ทางองคกรตองรับผิดชอบ และสวนไหนที่องคกรตอง
+สงมอบใหทางผูใหบริการคลาวดเปนผูดูแลให โดยอาศัยการตรวจสอบขอมูลรายละเอียดกับทางผูใหบริการ
+215
+Credit: https://www.antivirus.in.th/tips/2316.html
+Customer Security Responsibilities (ความรับผิดชอบของฝงผูใช)
+● เพื่อเติมเต็มระบบรักษาความปลอดภัยนอกเหนือไปจากที่ทางผูใหบริการคลาวดเตรียมเอาไวให ตามปกติ
+แลว ทางผูใชบริการก็จะตองรับผิดชอบในสวนของ Application, Middleware, Virtualization, Data, OS, 
+Network และ Runtime Security ใน IaaS Clouds (เชน Amazon Virtual Private Cloud - AVPC หรือ 
+Microsoft Azure Virtual Network VNet) เปนตน
+● ในสวนของ PaaS ผูใชงานจะไมตองรับผิดชอบมากนัก โดยทั่วไปก็มีแคการรักษาความปลอดภัยในสวนของ
+แอปพลิเคชัน และ Middleware สุดทายคลาวดสวนที่เปน SaaS สวนนี้ผูใชบริการคลาวดจะไมตอง
+รับผิดชอบอะไรมากนัก
+● ความรับผิดชอบของฝงผูใชหลัก ๆ ก็จะเปนดาน Data Security และ Identity and Access Management 
+อยางไรก็ตาม มันขึ้นอยูรูปแบบคลาวดที่ใชงานดวย เพราะบางรูปแบบ การเขารหัสขอมูล และขอตกลงใน
+การเขาใชงานจะเปนความรับผิดชอบของลูกคาดวย
+● องคกรสวนใหญจะนิยมนําระบบรักษาความปลอดภัยที่ใชอยูบนเครือขาย Local Area Networks (LANs) ที่
+ใชอยูภายในองคกรอยูแลวไปปรับใชกับคลาวดดวย ซึ่งจะชวยใหทีมผูดูแลไมจําเปนตองสรางนโยบายดาน
+ความปลอดภัยขึ้นมาใหมใหยุงยาก
+216
+Credit: https://www.antivirus.in.th/tips/2316.html
+
+--- PAGE 13 ---
+Cloud Security Tools
+● เครื่องมือดานการรักษาความปลอดภัยที่ถูกใชในสภาพแวดลอมที่อยูภายในองคกรควรถูกนําไปใชบนคลา
+วดดวย ถึงแมวาเครื่องมือบางตัวอาจจะมีเวอรชันคลาวดโดยเฉพาะอยูแลวก็ตาม เครื่องมือรักษาความ
+ปลอดภัยที่มีเฉพาะบนคลาวดก็อยางเชน
+○ Cloud Workload Protections Platforms (CWPPs) : เปนกลไกรักษาความปลอดภัยที่ออกแบบมา
+เพื่อปกปอง Workloads
+○ Cloud Access Security Brokers (CASBs) : เปนเครื่องมือ หรือบริการที่อยูกึ่งกลางระหวางลูกคาที่ใช
+คลาวด และผูใหบริการคลาวด เพื่อบังคับใชนโยบายรักษาความปลอดภัย เปรียบไดกับยามเฝาประตู ที่
+ชวยเพิ่มการรักษาความปลอดภัยไดอีกหนึ่งชั้น
+○ Cloud Security Posture Management (CSPM) : กลุมของผลิตภัณฑ และบริการดานความปลอดภัย 
+มีหนาที่หลายอยาง ตั้งแตการคอยตรวจสอบความปลอดภัยบนคลาวด, แกไขปญหา, ดูแลการตั้งคาคลา
+วดที่ผิดพลาด ฯลฯ
+217
+Credit: https://www.antivirus.in.th/tips/2316.html
+Cloud Security Tools (2)
+Security as a Service (SeCaaS) เปนสวนหนึ่งของ Software as a service ที่ทาง Cloud Security Alliance (CSA) ไดแบงเปน 10 หมวด ดังตอไปนี้
+1. Identity And Access Management (IAM) - เครื่องมือที่ใชระบุวาใคร หรืออะไรที่สามารถเขาถึงบริการและทรัพยากรในระบบคลาวดไดบาง และ
+ใชในการจัดการสิทธิ์อยางละเอียดไดจากสวนกลาง
+2. Data Loss Prevention (DLP) - ระบบที่ชวยปกปองขอมูลไมใหสูญหาย หรือรั่วไหล
+3. Web Security - ความปลอดภัยของเว็บไซต
+4. Email Security - ความปลอดภัยของอีเมล
+5. Security Assessments - การตรวจหาชองโหวของระบบ
+6. Intrusion Management - ระบบจัดการการบุกรุก
+7. Security Information and Event Management (SIEM) - เครื่องมือจัดการขอมูลความปลอดภัย และการจัดการเหตุการณดานความปลอดภัย 
+เพื่อนํามาวิเคราะหวางแผน
+8. Encryption - การเขารหัสขอมูล
+9. Business Continuity and Disaster Recovery (BCDR หรือ BC/DR) - กระบวนการในการกูระบบเพื่อใหธุรกิจสามารถดําเนินการตอได ในกรณี
+ที่ระบบลม หรือเกิดความเสียหาย
+10. Network Security - ความปลอดภัยของระบบเครือขาย
+218
+Credit: https://www.antivirus.in.th/tips/2316.html
+
+--- PAGE 14 ---
+220
+Week 15-2
+Identity and Access Management (IAM)
+06016421 IT Infrastructure Security
+by P . Sumet, IT/KMITL
+Identity and Access Management
+● NIST Identity & Access Management
+(https://www.nist.gov/identity-access-management)
+● NIST Special Publication 800-63 Digital Identity Guidelines
+(https://www.nist.gov/identity-access-management/nist-special-publication-800-63-digital-id
+entity-guidelines)
+● Digital Identity Guidelines
+(https://csrc.nist.gov/pubs/sp/800/63/4/2pd)
+(https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP .800-63-4.2pd.pdf) 
+● CISSP Domain 5 Identity and Access Management
+(https://www.dropbox.com/scl/ﬁ/auradi4aeptuwz6wr5sxc/Domain-5-Identity-and-Access-M
+anagement.pdf?rlkey=h9ujhl3hf7mjpgryxauhg8xzy&dl=0)
+221
+

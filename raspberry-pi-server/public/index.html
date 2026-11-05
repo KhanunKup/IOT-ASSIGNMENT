@@ -497,11 +497,51 @@
                 <div class="text-slate-600">Region: <span class="text-slate-800">AS923 (923.2 MHz / SF12)</span></div>
               </div>
 
-              <!-- MCP Endpoints -->
+              <!-- MCP Endpoints & tunnl.gg Remote Access -->
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-3">MCP Server Endpoints (Port 3000)</div>
-              <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 text-[11px] font-mono space-y-0.5">
-                <div>SSE: <span id="mcpSseUrl" class="text-brand-700 font-semibold">/sse</span></div>
-                <div>HTTP JSON-RPC: <span id="mcpHttpUrl" class="text-brand-700 font-semibold">/mcp</span></div>
+              <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 text-[11px] font-mono space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Local SSE:</span>
+                  <span id="mcpSseUrl" class="text-brand-700 font-semibold">/sse</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">HTTP JSON-RPC:</span>
+                  <span id="mcpHttpUrl" class="text-brand-700 font-semibold">/mcp</span>
+                </div>
+              </div>
+
+              <!-- tunnl.gg Remote Access Card -->
+              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-3 flex items-center justify-between">
+                <span>External Access (tunnl.gg)</span>
+                <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-mono font-bold">SSH Reverse Tunnel</span>
+              </div>
+              <div class="bg-brand-50/50 rounded-xl p-2.5 border border-brand-200/60 text-[11px] space-y-2">
+                <div class="text-[10px] text-slate-600 leading-relaxed">
+                  เชื่อมต่อ AI ภายนอก (Claude Desktop, ChatGPT, Gemini) เข้ามาสั่งงาน Pi จากนอกบ้านด้วยคำสั่ง SSH ทันที (ไม่ต้องลงโปรแกรมเพิ่ม):
+                </div>
+                <div class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-slate-200 font-mono text-[10px] text-slate-800 overflow-x-auto">
+                  <code id="tunnlCommand" class="flex-1">ssh -t -R 80:localhost:3000 proxy.tunnl.gg</code>
+                  <button onclick="copyTunnlCmd()" class="px-2 py-1 rounded bg-brand-700 hover:bg-brand-800 text-white font-sans text-[10px] font-semibold shrink-0 transition" title="คัดลอกคำสั่ง">
+                    Copy
+                  </button>
+                </div>
+                <!-- Interactive Config Generator -->
+                <div class="pt-1">
+                  <label class="block text-[10px] text-slate-500 font-medium mb-1">กรอก URL จาก tunnl.gg เพื่อสร้าง Claude Desktop Config:</label>
+                  <div class="flex gap-1.5">
+                    <input
+                      type="text"
+                      id="inputTunnlUrl"
+                      placeholder="https://xxxxx.tunnl.gg"
+                      class="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] text-slate-700 font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
+                      oninput="updateClaudeConfig()"
+                    />
+                    <button onclick="copyClaudeConfig()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-medium shrink-0 transition">
+                      Copy JSON
+                    </button>
+                  </div>
+                  <pre id="claudeConfigPreview" class="hidden mt-1.5 p-2 bg-slate-900 rounded-lg text-emerald-400 font-mono text-[9px] overflow-x-auto"></pre>
+                </div>
               </div>
             </div>
           </div>
@@ -940,6 +980,42 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+    }
+
+    // tunnl.gg UI Helper Functions
+    function copyTunnlCmd() {
+      navigator.clipboard.writeText('ssh -t -R 80:localhost:3000 proxy.tunnl.gg');
+      alert('คัดลอกคำสั่ง tunnl.gg เรียบร้อยแล้ว!\nนำไปรันใน Terminal บน Raspberry Pi เพื่อเปิดใช้งานได้ทันทีครับ');
+    }
+
+    function updateClaudeConfig() {
+      const urlInput = document.getElementById('inputTunnlUrl').value.trim();
+      const preview = document.getElementById('claudeConfigPreview');
+      if (!urlInput) {
+        preview.classList.add('hidden');
+        return;
+      }
+      const cleanUrl = urlInput.replace(/\/+$/, '');
+      const config = {
+        mcpServers: {
+          "raspberry-pi-iot": {
+            command: "npx",
+            args: ["-y", "mcp-remote", `${cleanUrl}/sse`]
+          }
+        }
+      };
+      preview.textContent = JSON.stringify(config, null, 2);
+      preview.classList.remove('hidden');
+    }
+
+    function copyClaudeConfig() {
+      const preview = document.getElementById('claudeConfigPreview');
+      if (preview.textContent) {
+        navigator.clipboard.writeText(preview.textContent);
+        alert('คัดลอกการตั้งค่า Claude Desktop เรียบร้อยแล้ว!');
+      } else {
+        alert('กรุณากรอก URL ที่ได้จาก tunnl.gg ก่อนครับ (เช่น https://xxxx.tunnl.gg)');
+      }
     }
 
     // Initial fetch & loop every 3 seconds

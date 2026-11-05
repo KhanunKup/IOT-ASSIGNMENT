@@ -1,0 +1,422 @@
+--- PAGE 1 ---
+135
+Week 13 Firewall
+06016421 IT Infrastructure Security
+by P . Sumet, IT/KMITL
+Firewall - Descriptions and Roles (P .7/48)
+● Firewalls are devices or programs that control the ﬂow of network traﬃc between networks or hosts 
+that employ differing security postures.
+● At one time, most ﬁrewalls were deployed at network perimeters.
+○ This provided some measure of protection for internal hosts, but it could not recognize all instances and forms of attack, 
+and attacks sent from one internal host to another often do not pass through network ﬁrewalls.
+○ Because of these and other factors, network designers now often include ﬁrewall functionality at places other than the 
+network perimeter to provide an additional layer of security, as well as to protect mobile devices that are placed directly 
+onto external networks.
+● Threats have gradually moved from being most prevalent in lower layers of network traﬃc to the 
+application layer, which has reduced the general effectiveness of ﬁrewalls in stopping threats carried 
+through network communications.
+○ However, ﬁrewalls are still needed to stop the signiﬁcant threats that continue to work at lower layers of network traﬃc. 
+Firewalls can also provide some protection at the application layer, supplementing the capabilities of other network 
+security technologies.
+● There are several types of ﬁrewalls, each with varying capabilities to analyze network traﬃc and 
+allow or block speciﬁc instances by comparing traﬃc characteristics to existing policies.
+○ Understanding the capabilities of each type of ﬁrewall, and designing ﬁrewall policies and acquiring ﬁrewall technologies 
+that effectively address an organization’s needs, are critical to achieving protection for network traﬃc ﬂows.
+136
+(Reference : https://csrc.nist.gov/pubs/sp/800/41/r1/ﬁnal )
+
+--- PAGE 2 ---
+Guidelines for Firewall Implementation (P .7/48)
+To improve the effectiveness and security of their ﬁrewalls, organizations should implement the following recommendations:
+● Create a ﬁrewall policy that speciﬁes how ﬁrewalls should handle inbound and outbound network traﬃc.
+○ A ﬁrewall policy deﬁnes how an organization’s ﬁrewalls should handle inbound and outbound network traﬃc  for speciﬁc IP addresses and address ranges, 
+protocols, applications, and content types based on the organization’s information security policies.
+○ Organizations should conduct risk analysis  to develop a list of the types of traﬃc needed by the organization and how they must be secured—including which 
+types of traﬃc can traverse a ﬁrewall under what circumstances.
+● Identify all requirements that should be considered when determining which ﬁrewall to implement.
+○ Organizations need to determine which network areas need to be protected, and which types of ﬁrewall technologies will be most effective for the types of traﬃc 
+that require protection.
+○ There are many considerations that organizations should include in their ﬁrewall selection and planning processes. 
+● Create rulesets that implement the organization’s ﬁrewall policy while supporting ﬁrewall performance.
+○ Firewall rulesets should be as speciﬁc as possible with regards to the network traﬃc they control.
+○ To create a ruleset involves determining what types of traﬃc are required, including protocols the ﬁrewall may need to use for management purposes.
+○ Details of creating rulesets vary by type of ﬁrewall and speciﬁc products, but many ﬁrewalls can have their performance improved by optimizing ﬁrewall rulesets.
+● Manage ﬁrewall architectures, policies, software, and other components throughout the life of the ﬁrewall solutions.
+○ There are many aspects to ﬁrewall management.
+■ For example, choosing the type or types of ﬁrewalls to deploy and their positions within the network can signiﬁcantly affect the security policies that the 
+ﬁrewalls can enforce.
+○ Policy rules may need to be updated as the organization’s requirements change, such as when new applications or hosts are implemented within the network.
+○ Firewall rulesets and policies should be managed by a formal change management control process because of their potential to impact security and business 
+operations, with ruleset reviews or tests performed periodically to ensure continued compliance with the organization’s policies.
+○ Logs and alerts should be continuously monitored to identify threats—both successful and unsuccessful.
+○ Firewall performance needs to be monitored to enable potential resource issues to be identiﬁed and addressed before components become overwhelmed.
+○ Firewall software should be patched as vendors provide updates to address vulnerabilities. 137
+Overview of Firewall Technologies (P .11/48)
+● While ﬁrewalls are often discussed in the context of Internet connectivity, they may also have applicability in other network 
+environments. For example, many enterprise networks employ ﬁrewalls to restrict connectivity to and from the internal networks 
+used to service more sensitive functions, such as accounting or personnel.
+● By employing ﬁrewalls to control connectivity to these areas, an organization can prevent unauthorized access to its systems and 
+resources. Inclusion of a proper ﬁrewall provides an additional layer of security. 
+● Organizations often need to use ﬁrewalls to meet security requirements from mandates (e.g., FISMA); some mandates, such as the 
+Payment Card Industry (PCI) Data Security Standard (DSS), speciﬁcally require ﬁrewalling.
+138
+Application Layer . This layer sends and receives data for particular applications, such as Domain Name System (DNS), Hypertext 
+Transfer Protocol (HTTP), and Simple Mail Transfer Protocol (SMTP). The application layer itself has layers of protocols within it. For 
+example, SMTP encapsulates the Request for Comments (RFC) 2822 message syntax, which encapsulates Multipurpose Internet Mail 
+Extensions (MIME), which can encapsulate other formats such as Hypertext Markup Language (HTML).
+Transport Layer. This layer provides connection-oriented or connectionless services for transporting application layer services between 
+networks, and can optionally ensure communications reliability. Transmission Control Protocol (TCP) and User Datagram Protocol (UDP) 
+are commonly used transport layer protocols.
+IP Layer (also known as the Network Layer) . This layer routes packets across networks. Internet Protocol version 4 (IPv4) is the 
+fundamental network layer protocol for TCP/IP. Other commonly used protocols at the network layer are Internet Protocol version 6 (IPv6), 
+ICMP, and Internet Group Management Protocol (IGMP).
+Hardware Layer (also known as the Data Link Layer). This layer handles communications on the physical network components. The best 
+known data link layer protocol is Ethernet.
+
+--- PAGE 3 ---
+Firewall Technologies (P .12/48)
+● Packet Filtering : (a.k.a. stateless inspection ﬁrewalls)
+● Stateful Inspection : Track the state of connections and block packets 
+               that deviate from the expected state.
+● Application Firewalls
+○ Allow or deny access based on how an application is running over the network.
+■ For instance, an application ﬁrewall can determine if an email message contains a type of attachment that the organization does not permit (such as an executable ﬁle), or if instant 
+messaging (IM) is being used over port 80 (typically used for HTTP).
+■ Another feature is that it can block connections over which speciﬁc actions are being performed (e.g., users could be prevented from using the FTP “put” command, which allows users 
+to write ﬁles to the FTP server). 
+■ Allow or deny web pages that contain particular types of active content, such as Java or ActiveX, or that have SSL certiﬁcates signed by a particular certiﬁcate authority (CA), such as a 
+compromised or revoked CA.
+● Application-Proxy Gateways
+○ Combines lower-layer access control with upper-layer functionality.
+○ Contain a proxy agent that acts as an (transparent) intermediary between two hosts 
+that wish to communicate with each other, and never allows a direct connection between them.
+● Dedicated Proxy Servers
+○ Retain proxy control of traﬃc
+○ Have much more limited ﬁrewalling capabilities.
+● Virtual Private Networking (VPN)
+● Network Access Control
+○ Perform client checks for incoming connections from remote users and allow or disallow access based on those checks. This checking, commonly called network access control (NAC) or 
+network access protection (NAP), allows access based on the user’s credentials  and the results of performing “health checks”  on the user’s computer. Health checks typically consist of 
+verifying that one or more of the following comply with organizational policy:
+■ Latest updates to antimalware and personal ﬁrewall software
+■ Conﬁguration settings for antimalware and personal ﬁrewall software
+■ Elapsed time since the previous malware scan
+■ Patch level of the operating system and selected applications
+■ Security conﬁguration of the operating system and selected applications
+● Uniﬁed Threat Management (UTM) : Many ﬁrewalls combine multiple features into a single system.
+● Web Application Firewalls (WAF) : Put in front of web servers to prevent attacks on the server.
+● Firewalls for Virtual Infrastructures : Monitor virtualized machines and networks. 139
+Firewalls for Individual Hosts and Home Networks (P .21/48)
+Host-Based Firewalls and Personal Firewalls
+Personal Firewall Appliances
+140
+
+--- PAGE 4 ---
+Limitations of Firewall Inspection (P .21/48)
+Firewalls can only work effectively on traﬃc that they can inspect.
+● A ﬁrewall that cannot understand the traﬃc ﬂowing through it will not handle 
+that traﬃc properly—for example, allowing traﬃc that should be blocked.
+○ Encrypted Traﬃc
+○ Tunneled Traﬃc
+● Firewall’s rules will determine what to do with traﬃc it does not (or, in the case 
+of encrypted traﬃc, cannot) understand.
+○ An organization should have policies about how to handle traﬃc in such cases, such as either 
+permitting or blocking encrypted traﬃc that is not authorized to be encrypted.
+■ จะใหทํายังไงกับ Traﬃc ที่ถูก Encrypted หรือ Tunneled โดยไมไดรับอนุญาต
+141
+Recommendations for Firewall Implementation (P .22/48)
+● The use of NAT should be considered a form of routing, not a type of ﬁrewall. 
+● Organizations should only permit outbound traﬃc that uses the source IP 
+addresses in use by the organization.
+○ คําถาม 01 : เพื่อปองกัน Threat ใดตามนิยาม STRIDE Threat Model ?
+● Compliance checking is only useful in a ﬁrewall when it can block communication 
+that can be harmful to protected systems.
+● When choosing the type of ﬁrewall to deploy, it is important to decide whether the 
+ﬁrewall needs to act as an application proxy.
+● Management of personal ﬁrewalls should be centralized to help eﬃciently create, 
+distribute, and enforce policies for all users and groups.
+○ คําถาม 02 : MS Windows มีเครื่องมืออะไรที่สามารถใชเพื่อใหเกิดผลตามนี้ได
+142
+
+--- PAGE 5 ---
+Firewalls and Network Architectures (P .23/48)
+● Firewalls are used to separate networks with differing security requirements,
+○ e.g., the Internet and an internal network that houses servers with sensitive data.
+● Organizations should use ﬁrewalls wherever their internal networks and systems interface with 
+external networks and systems, and where security requirements vary among their internal 
+networks.
+● Organizations should properly determine where ﬁrewalls should be placed, and where other 
+networks and systems should be located in relation to the ﬁrewalls.
+● Network Layouts with Firewalls
+○ Simple Routed Network with Firewall Device (Fig. 3-1)
+○ Firewall with a DMZ (Fig. 3-2)
+● Firewalls Acting as Network Address Translators
+○ Typically, a NAT acts as a router that has a network with private addresses on the inside and a single 
+public address on the outside. The way a NAT performs this many-to-one mapping varies between 
+implementations, but almost always involves the following:
+○ Hosts on the inside network initiating connections to the outside network cause the NAT to map the 
+source port of the connection to a different source port that is controlled by the NAT. The NAT uses 
+this source port number to map connections from the outside back to the host on the inside.
+○ Hosts on the outside of the network cannot initiate contact with hosts on the inside network. In some 
+ﬁrewalls, the NAT can be conﬁgured to map a particular destination port on the NAT to a particular 
+host on the inside of the NAT; for example, all HTTP requests that go to the NAT could be directed to a 
+single host on the protected side of the ﬁrewall. This feature is sometimes called pinholing. 
+● Architecture with Multiple Layers of Firewalls
+○ No limitation on where a ﬁrewall can be placed in a network. While ﬁrewalls should be at the edge of a 
+logical network boundary, creating an “inside” and “outside” on either side of the ﬁrewall, a network 
+administrator may wish to have additional boundaries within the network and deploy additional 
+ﬁrewalls to establish such boundaries.
+○ The use of multiple layers of ﬁrewalls is quite common to provide defense-in-depth. 143
+Recommendations for Firewalls and Network Architectures (P .26/48)
+● In general, a ﬁrewall should ﬁt into a current network’s layout. However, an 
+organization might change its network architecture at the same time as it 
+deploys a ﬁrewall as part of an overall security upgrade.
+● Different common network architectures lead to very different choices for 
+where to place a ﬁrewall, so an organization should assess which architecture 
+works best for its security goals.
+● If an edge ﬁrewall has a DMZ, consider which outward-facing services should 
+be run from the DMZ and which should remain on the inside network.
+● Do not rely on NATs to provide the beneﬁts of ﬁrewalls.
+● In some environments, putting one ﬁrewall behind another may lead to a 
+desired security goal, but in general such multiple layers of ﬁrewalls can be 
+troublesome. (For further details, read Topic 3.3 P .26/48)
+144
+
+--- PAGE 6 ---
+Firewall Policy (P .28/48)
+● A ﬁrewall policy dictates how ﬁrewalls should handle network traﬃc for speciﬁc IP addresses and address ranges, protocols, 
+applications, and content types (e.g., active content) based on the organization’s information security policies.
+○ Before a ﬁrewall policy is created, some form of risk analysis should be performed to develop a list of the types of traﬃc needed by the organization 
+and categorize how they must be secured — including which types of traﬃc can traverse a ﬁrewall under what circumstances.
+○ This risk analysis should be based on an evaluation of threats; vulnerabilities; countermeasures in place to mitigate vulnerabilities; and the impact if 
+systems or data are compromised.
+○ Firewall policy should be documented in the system security plan and maintained and updated frequently as classes of new attacks or vulnerabilities 
+arise, or as the organization’s needs regarding network applications change.
+○ The policy should also include speciﬁc guidance on how to address changes to the ruleset.
+● Generally, ﬁrewalls should block all inbound and outbound traﬃc that has not been expressly permitted by the ﬁrewall 
+policy—traﬃc that is not needed by the organization.
+○ This practice, known as deny by default, decreases the risk of attack and can also reduce the volume of traﬃc carried on the organization’s networks.
+○ Because of the dynamic nature of hosts, networks, protocols, and applications, deny by default is a more secure approach than permitting all traﬃc that 
+is not explicitly forbidden.
+● Policies Based on IP Addresses and Protocols
+○ IP Addresses and Other IP Characteristics; IPv6; TCP and UDP; ICMP; IPsec Protocols
+● Policies Based on Applications
+○ Inbound application ﬁrewalls or application proxies take a different approach—they let traﬃc destined for a particular server into the network, but 
+capture that traﬃc in a server that processes it like a port-based ﬁrewall.
+○ The application-based approach provides an additional layer of security for incoming traﬃc by validating some of the traﬃc before it reaches the 
+desired server. The theory is that the inbound application ﬁrewall’s or proxy’s additional security layer can protect the server better than the server can  
+protect itself—and can also remove malicious traﬃc before it reaches the server to help reduce server load.
+● Policies Based on User Identity :  One of the most common ways to enforce user identity policy at a ﬁrewall is by using a VPN.
+● Policies Based on Network Activity : ใชเงื่อนไขเชน Session Idle Period, Incoming Traﬃc/Request Rate, Source Attributes,...
+145
+Recommendations for Firewall Policy (P .34/48)
+● An organization’s ﬁrewall policy should be based on a comprehensive risk analysis.
+○ คําถาม 01 : Risk analysis มีอะไรบาง
+● Firewall policies should be based on blocking all inbound and outbound traﬃc, with 
+exceptions made for desired traﬃc.
+○ คําถาม 02 : เทียบไดกับ Blacklist policy หรือ Whitelist policy
+● Policies should take into account the source and destination of the traﬃc in addition to 
+the content.
+● Many types of IPv4 traﬃc, such as that with invalid or private addresses, should be 
+blocked by default.
+● Organizations should have policies for handling incoming and outgoing IPv6 traﬃc.
+● An organization should determine which applications may send traﬃc into or out of its 
+network and make ﬁrewall policies to block traﬃc for other applications.
+146
+
+--- PAGE 7 ---
+Firewall Planning and Implementation (P .35/48)
+A successful ﬁrewall deployment can be achieved by following a clear, step-by-step planning and implementation 
+process.
+The use of a phased approach for deployment can minimize unforeseen issues and identify potential pitfalls early on.
+● Plan. The ﬁrst phase of the process involves identifying all requirements that an organization should consider 
+when determining which ﬁrewall to implement to enforce the organization’s security policy.
+● Conﬁgure. The second phase involves all facets of conﬁguring the ﬁrewall platform. This includes installing 
+hardware and software as well as setting up rules for the system.
+● Test. The next phase involves implementing and testing a prototype of the designed solution in a lab or test 
+environment. The primary goals of testing are to evaluate the functionality, performance, scalability, and 
+security of the solution, and to identify any issues—such as interoperability—with components.
+● Deploy. Once testing is completed and all issues are resolved, the next phase focuses on deployment of the 
+ﬁrewall into the enterprise.
+● Manage. After the ﬁrewall has been deployed, it is managed throughout its lifecycle to include component 
+maintenance and support for operational issues. This lifecycle process is repeated when enhancements or 
+signiﬁcant changes need to be incorporated into the solution.
+147
+Firewall Planning and Implementation - Plan (P .35/48)
+Basic principles that organizations should follow in the planning of ﬁrewall deployments
+● Use devices as they were intended to be used
+○ E.g., routers are meant to handle routing, not highly complex ﬁltering, which can cause an excess burden on the router’s processor.
+○ Additionally, ﬁrewalls should not be expected to provide non-security services, such as acting as a web server or email server.
+● Create defense-in-depth
+○ Defense-in-depth can be accomplished by using multiple ﬁrewalls throughout an organization, including at the perimeter, in front of sensitive 
+internal departments, and on individual computers.
+● Pay attention to internal threats
+○ Focusing attention solely on external threats leaves the network wide open to attacks from within. These threats may not come directly from 
+insiders, but can involve internal hosts infected by malware or otherwise compromised by external attackers. Important internal systems should be 
+placed behind internal ﬁrewalls.
+● Document the ﬁrewall’s capabilities
+○ Each model of ﬁrewall has different capabilities and limitations. These will sometimes affect the planning of the organization’s security policy and 
+ﬁrewall deployment strategy. Any features that positively or negatively affect this planning should be written into the overall planning document. 
+Organizations should consider the following when purchasing and implementing a ﬁrewall solution
+● Security Capabilities : Features, Supported Technologies or Protocols, Network areas to be protected, …
+● Management : How to manage the ﬁrewall?
+● Performance (generally for network ﬁrewalls only)
+● Integration : Compatibility, Interoperability, Additional hardware/software requirements
+● Physical Environment : พื้นที่ติดตั้ง, ระบบไฟ, ระบบปรับอากาศ, ระบบปองกันภัยตางๆเชนอัคคีภัย ฯลฯ
+(generally a consideration for network ﬁrewalls, although it may also apply to the centralized components of host-based ﬁrewall implementations)
+● Personnel : Required skill sets of person in charge of ﬁrewall admin.
+● Future Needs including scalability issue and so on…
+148
+
+--- PAGE 8 ---
+Firewall Planning and Implementation - Conﬁgure (P .38/48)
+The conﬁguration phase involves all facets of conﬁguring the ﬁrewall platform. This includes 
+installing hardware and software, conﬁguring policies, conﬁguring logging and alerting, and 
+integrating the ﬁrewall into the network architecture.
+● Hardware and Software Installation
+● Policy Conﬁguration
+○ At minimum, the following rules should be deﬁned:
+■ Port ﬁltering should be enabled at the outer edge of the network, and probably at places inside the network as well.
+■ Content ﬁltering should be done as close to the content receiver as possible. 
+● Logging and Alerts Conﬁguration
+○ Notiﬁcations may include the following:
+■ Any modiﬁcations or disabling of the ﬁrewall rules
+■ System reboots, disk shortages, and other operational events
+■ Secondary system status changes, if applicable
+149
+Firewall Planning and Implementation - Test (P .40/48)
+● New ﬁrewalls should be tested and evaluated before deployment to ensure that they are working properly.
+● Testing should be completed on a test network without connectivity to the production network.
+● This test network should attempt to replicate the production network as faithfully as possible, including the network topology and network traﬃc that 
+would travel through the ﬁrewall. Aspects of the solution to evaluate include the following:
+○ Connectivity
+■ Users can establish and maintain connections through the ﬁrewall.
+○ Ruleset
+■ Traﬃc that is speciﬁcally allowed by the security policy is permitted. All traﬃc that is not allowed by the security policy is blocked. 
+■ Veriﬁcation of the ruleset should include both reviewing it manually and testing whether the rules work as expected. 
+○ Application Compatibility
+■ Do not break or interfere with the use of existing software applications.
+○ Management
+■ Administrators can conﬁgure and manage the solution effectively and securely.
+○ Logging
+■ Logging and data management function in accordance with the organization’s policies and strategies.
+○ Performance
+■ Solutions provide adequate performance during normal and peak usage.
+○ Security of the Implementation
+■ The ﬁrewall implementation itself may contain vulnerabilities and weaknesses that attackers could exploit
+○ Component Interoperability
+■ Components of the ﬁrewall solution must function together properly.
+○ Policy Synchronization
+■ If there are multiple ﬁrewalls running synchronized policies or groups of rules, test that the synchronization works in various scenarios 
+(such as if one or more nodes are oﬄine). 
+○ Additional Features
+■ Additional features that will be used by the ﬁrewall—such as VPN and antimalware capabilities—should be tested to ensure they are 
+working properly. 150
+
+--- PAGE 9 ---
+Firewall Planning and Implementation - Deploy (P .40/48)
+● Once testing is complete and all issues have been resolved, the next phase of the ﬁrewall 
+planning and implementation model is deployment, which should be done in accordance 
+with organization policies.
+● Before deploying the ﬁrewall,
+○ Administrators should notify users or owners of potentially affected systems of the planned deployment, and 
+instruct them who to notify if they encounter any problems.
+○ Any changes required to other equipment should also be coordinated as part of the ﬁrewall deployment.
+○ The security policy expressed by the ﬁrewall’s conﬁguration should be added to the overall security policy of the 
+organization, and the ongoing changes to its conﬁguration should be integrated with the organization’s 
+conﬁguration management processes.
+○ If multiple ﬁrewalls are being deployed, including personal ﬁrewalls or at multiple branch oﬃces,
+■ A gradual or phased approach should be considered;
+■ A pilot program would also be helpful, especially for identifying and resolving issues of conﬂicting policies.
+○ This will provide administrators with an opportunity to evaluate the ﬁrewall solution’s impact and resolve issues 
+before enterprise-wide deployment.
+● Connecting a ﬁrewall to the organization’s network requires more than just inserting the ﬁrewall into the traﬃc ﬂow 
+from the outside of the network to the inside: it also involves integrating the ﬁrewall with other network elements that 
+will interact with the ﬁrewall. 151
+Firewall Planning and Implementation - Manage (P .41/48)
+● This last phase of the ﬁrewall planning and implementation model is the longest lasting, because managing the solution involves 
+maintaining ﬁrewall architecture, policies, software, and other components of the solution chosen to be deployed.
+● One example of a typical maintenance action is testing and applying patches to ﬁrewall devices.
+● Policy rules may need to be updated as new threats are identiﬁed and requirements change, such as when new applications or hosts 
+are implemented within the network, and should be reviewed periodically to ensure they remain in compliance with security policy.
+● It is important to monitor the performance of ﬁrewall components to ensure that potential resource issues are identiﬁed and 
+addressed before components become overwhelmed.
+● Logs and alerts should be monitored continuously to identify threats—successful and unsuccessful—that are made to the system.
+● Another important task is to perform periodic testing to verify that ﬁrewall rules are functioning as expected.
+● Firewall policies and rulesets should be backed up regularly.
+● Some ﬁrewalls can store this information in multiple formats, such as a binary format that is used to conﬁgure the ﬁrewall and a 
+human-readable format that can be read by auditors. If multiple formats are available, backups should be kept in all of them.
+● Changes to ﬁrewall rulesets/policies impact security and should be managed as part of a formal conﬁguration management process. 
+Many ﬁrewalls have auditing of changes as part of their administrative interfaces, but this does not necessarily track policy changes. 
+At a minimum, a log should be kept of all policy decisions and ruleset changes—and this log should be associated with the ﬁrewall.
+● It is best to review the ﬁrewall policy at regular intervals so that such reviews do not only happen during policy or security audits (or, 
+worse, only during emergencies).
+● Organizations may want to consider conducting penetration testing to assess the overall security of their network environment. This 
+testing can be used to verify that a ﬁrewall ruleset is performing as intended by generating network traﬃc and monitoring how it is 
+handled by the ﬁrewall in comparison with its expected response. Penetration testing should be employed in addition to, rather than 
+instead of, a conventional audit program. 152
+
+--- PAGE 10 ---
+Lab 6 : Firewall
+● Lab 6-A ติดตั้งและหัดใช Fortigate Firewall (FGT) ver. 6.4.15 — Free Version Time Limit
+● Lab 6-B สราง Firewall Policy ให LAN และ WAN ติดตอกันได
+● Lab 6-C สราง Firewall 3 ขา เชื่อมตอ LAN, WAN, และ DMZ (Option)
+Download :
+Oﬃcial Site : https://support.fortinet.com/Download/VMImages.aspx 
+GNS3 Market Place : https://www.gns3.com/fortigate/-/join 
+YouTube How to Download & Install ver. 6.4.5 : https://youtu.be/nqJ7-4tB7jM?si=jMIbiyWitWTxfz_r  ← ดูวิธีติดตั้งที่นี่ 
+Disk Image ver. 6.4.15 : https://www.dropbox.com/scl/ﬁ/it3lq3eday70zx99hanzg/FGT_VM64_KVM-v6.M-build2095-FORTINET.out.kvm.zip?rlkey=7lbdnka8bqnkqap92ht1gu8bt&dl=0 
+Lab Manual : 
+https://docs.fortinet.com/document/fortigate/6.4.15/administration-guide/954635/getting-started
+https://docs.fortinet.com/product/fortigate/6.4.15 
+153
+Lab 6-A : Firewall Setup 
+1. ติดตั้ง Firewall Appliance ใน GNS3
+- ถาเปน Fortigate (FGT) ใหใช ver. 6.X.X (แนะนํา 6.4.15)
+(หามใช ver. 7 เพราะ FGT Eval. Ver. จะเลือก TLS/SSL และ Encryption Method ใน
+การทํา VPN ไมได ทําใหมีปญหาในการ Connect ดวย Client ที่ตัวเลือกบังคับเชนกัน)
+2. ติดตั้ง Network และ Firewall ดังรูป
+3. ติดตั้ง Management Interface ของ Firewall ใหรับ IP จาก DHCP Server
+     และใหยอมรับการ PING, SSH และ HTTP
+4. ลอง Ping จาก PC ใน Management Network ไปยัง Firewall
+5. ลอง Access จาก PC ใน Management Network ไปยัง Firewall ดวยการ 
+    TELNET, SSH และ Browse ผาน Web
+6. ลองเขาเมนู Dash Board และเมนูตางๆที่จะทําใหสามารถคอนฟก Firewall 
+    เชน Network → Interface, Policy & Objects → Firewall Policy, VPN,
+           User & Authen., Log & Report, และ Conﬁg. Management
+7. บันทึกสิ่งที่ไดทําและผลการทดลองขอ 4-6
+154
+Zone IP Address
+Management 10.30.6.0/24
+Outside 203.0.113.0/24
+Inside 192.168.1.0/24
+
+
+--- PAGE 11 ---
+Lab 6-B : สราง Firewall Policy ให LAN และ WAN ติดตอกันได 
+1. ติดตั้ง Network และ Firewall ดังรูป โดยหามใช NAT (อยาลืมปด NAT)
+2. ติดตั้ง Web Server, Telnet Server SSH Server บน Internet Server
+3. คอนฟก Firewall ให Client และ Internet Server สามารถ Ping, 
+    Browse WEB และ SSH ไปมาหากันได แลวบันทึกสิ่งที่ทําและผลที่ได
+4. ลองคอนฟก Firewall Policy ให Block สิ่งที่ทําในขอ 3 ไดทั้งหมด
+    ยกเวนให Client สามารถ Ping ไปหา Internet Server ไดเทานั้น
+    แลวบันทึกสิ่งที่ทําและผลที่ได
+5. ลองคอนฟก Firewall Policy ให Client สามารถ Browse WEB และ 
+    SSH ไปหา Internet Server ได แตหาม PING แลวบันทึกสิ่งที่ทํา
+    และผลที่ได
+6. (คําถาม) ถาตองการกําหนดใหบาง IP จาก Inside สามารถ Access 
+     บาง IP ที่ Outside ตองกําหนดอยางไร
+7. (คําถาม) ถาตองการกําหนดใหบาง IP จาก Outside สามารถ Access 
+     บาง IP ที่ Inside ตองกําหนดอยางไร
+8. (คําถาม) จาก Guideline ที่วาเราควรใช NAT สําหรับการทํา Routing 
+     เทานั้นโดยไมควรใชมันโดยหวังผลเรื่องของ Security นศ เห็นดวย
+     หรือไม อยางไร
+9. (คําถาม) นศ คิดวาการทํา Access Control โดยอุปกรณ Firewall เหมือน
+    หรือแตกตางจากการทําโดย Router หรือไมอยางไร 155
+Zone IP Address
+Management 10.30.6.0/24
+Outside 203.0.113.0/24
+Inside 192.168.1.0/24
+157
+
+

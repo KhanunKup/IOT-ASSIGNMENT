@@ -1,0 +1,91 @@
+--- PAGE 1 ---
+115
+Week 10
+Lab 4 (W10) - Impact of DoS Attack on Network Performance
+06016421 IT Infrastructure Security
+by P . Sumet, IT/KMITL
+Review for Some Attacks
+● Attack caused by Malware (อาน Ch.6 Stallings)
+○ เนนแพรกระจาย
+■ ตองพึ่งพาพาหะเทานั้น
+● Executable Files, Boot Sector, Script Enabled-Text Files
+■ ไมตองพึ่งพาพาหะก็ได
+● แพรผาน Attack Surfaces ทาง Software, Human, Network
+○ เนนติด Target แลวโจมตีตามวัตถุประสงค
+■ System/Data Corruption
+■ Information Disclosure/Leakage/Breach…
+■ Botnets or Actions on Objectives
+● DoS/DDoS Attack (อาน Ch.7 Stallings)
+○ Resource Exhausion Attack
+○ Bug/Vulnerability Attack (i.e., expliot a weakness of target)
+● Security Control for Attacks : Prevent, Detect, Identify, Correct, and Recovery
+116
+
+--- PAGE 2 ---
+Lab 4 : Impact of DoS Attack on Network Performance
+Lab 4-A - Impact of DoS Attack on UDP Traﬃc
+Lab 4-B - Impact of DoS Attack on TCP Traﬃc
+Brief
+1. ทดลองสรางสถานการณเสมือนการใชงานของ User ปกติ (ดวย iperf3)
+2. ทดลองสรางสถานการณเสมือน Server โดน DoS Attack (ดวย hping3)
+** กอนเริ่มใช  hping3 ตรวจสอบวาไมมี  Route ออกไปขางนอกรวมทั้ง  Default Route **
+3. วัดผลที่เกิดกับ Server อาจใช Application หรือใช Host Agent แสดงขึ้น Dashboard
+4. วัดผลที่เกิดกับ User โดยดูจากผล iperf3
+5. วิเคราะหผลกระทบจากการ DoS ทั้งที่เกิดกับ Server และ User
+117
+Penetration Test Tools
+iperf3
+- https://iperf.fr/
+- https://iperf.fr/iperf-doc.php
+- https://github.com/esnet/iperf
+- https://www.otiknetwork.com/?p=639
+hping3
+- https://denizhalil.com/2024/03/18/mastering-hping3-guide-network-security/
+- https://www.kali.org/tools/hping3/
+- https://github.com/Samsar4/Ethical-Hacking-Labs/blob/master/2-Scanning-Networks/1-hping3.md
+118
+
+--- PAGE 3 ---
+Lab 4-A : Impact of DoS Attack on UDP Traﬃc
+1. ติดตั้ง iperf3 ที่ Observer และ Web Server และ ติดตั้ง hping3 ที่ 
+Attacker
+2. ที่ Web Server สั่ง iperf -s -B x.x.x.x (IP ของมันเองที่อยู 20.X.1.0/24)
+3. เริ่มการทดลองแบบยังไมมีการโจมตี โดยให Observer สง UDP Traﬃc 
+ไป Web Server ทิ้งไวสัก 30 วินาที, i.e., iperf3 -c x.x.x.x -b 1M -t 30 -u
+4. บันทึก Bit Rate, Loss Rate, และ Jitter ที่วัดที่ฝง Receiver
+5. ทําการทดลองแบบโจมตี โดยให Observer สราง Traﬃc ตามขอ 3 แลว
+รีบให Attacker ทําการสั่ง hping3 เพื่อ Flood ICMP Packets โจมตีไปยัง 
+Web Server, i.e., hping3 x.x.x.x -1 --ﬂood
+6. บันทึก Bit Rate, Loss Rate, และ Jitter ที่วัดที่ฝง Receiver
+7. วิเคราะหผลการทดลองในขอ 4 เปรียบเทียบกับขอ 6
+8. อยาลืมเก็บ Project ไวเพราะ Lab 5 จะใช Network Topology นี้อีก
+119
+กอนเริ่มใช  hping3 ใหเอา  Default Route ออกใหหมดกอน 
+x.x.x.x
+ถาทําทั้งหมดนี้คนเดียว  Attacker มีแคตัวเดียวได 
+Lab 4-B : Impact of DoS Attack on TCP Traﬃc
+1. ติดตั้ง iperf3 ที่ Observer และ Web Server และ ติดตั้ง hping3 ที่ 
+Attacker
+2. ที่ Web Server สั่ง iperf -s -B x.x.x.x (IP ของมันเองที่อยู 20.X.1.0/24)
+3. เริ่มการทดลองแบบยังไมมีการโจมตี โดยให Observer สง TCP Traﬃc 
+ไป Web Server ทิ้งไวสัก 30 วินาที, i.e., iperf3 -c x.x.x.x -b 1M -t 30
+4. บันทึก Bit Rate ที่ Receiver และจํานวนครั้ง Restransmit ที่ Sender
+5. ทําการทดลองแบบโจมตี โดยให Observer สราง Traﬃc ตามขอ 3 แลว
+รีบให Attacker ทําการสั่ง hping3 เพื่อ Flood ICMP Packets โจมตีไปยัง 
+Web Server, i.e., hping3 x.x.x.x -1 --ﬂood
+6. บันทึก Bit Rate ที่ Receiver และจํานวนครั้ง Restransmit ที่ Sender
+7. วิเคราะหผลการทดลองในขอ 4 เปรียบเทียบกับขอ 6
+8. อยาลืมเก็บ Project ไวเพราะ Lab 5 จะใช Network Topology นี้อีก
+120
+กอนเริ่มใช  hping3 ใหเอา  Default Route ออกใหหมดกอน 
+x.x.x.x
+ถาทําทั้งหมดนี้คนเดียว  Attacker มีแคตัวเดียวได 
+
+--- PAGE 4 ---
+Lab 4 : Questions
+จงอธิบายวาผลกระทบจากการ DoS ที่มีตอ UDP Traﬃc และ TCP Traﬃc เหมือนหรือ
+แตกตางกันอยางไร พรอมอธิบายเหตุผลวาทําไมเปนเชนนั้น
+121
+Lab 4 : Notes
+122
+

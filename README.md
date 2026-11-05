@@ -232,3 +232,53 @@ npx @modelcontextprotocol/inspector http://<IP-ของ-Raspberry-Pi>:3000/sse
 }
 ```
 เปิด Claude Desktop จะมีรูปค้อน 🔨 แสดงขึ้นมา สามารถสั่งงานด้วยภาษาธรรมชาติได้ทันที
+
+---
+
+## 8. การเชื่อมต่อ AI ภายนอกผ่าน tunnl.gg (External MCP Access)
+
+หากต้องการให้ **Claude Desktop บนแล็ปท็อปนอกบ้าน**, **ChatGPT**, หรือ **Google Gemini** สามารถเชื่อมต่อเข้ามาเรียกใช้ MCP Tools บน Raspberry Pi ได้จากระยะไกล โดยไม่ต้อง Forward Port หรือสมัครบริการใดๆ:
+
+ระบบรองรับ **`tunnl.gg`** ซึ่งเป็นบริการ SSH Reverse Tunnel สาธารณะฟรี โดยใช้คำสั่ง `ssh` ที่ติดตั้งมาพร้อมกับ Linux/Raspberry Pi OS อยู่แล้ว:
+
+### 8.1 คำสั่งเปิดใช้งานบน Raspberry Pi
+
+เปิด Terminal หรือ SSH เข้า Raspberry Pi แล้วรันคำสั่ง:
+```bash
+cd ~/raspberry-pi-server
+
+# วิธีที่ 1: รันผ่าน npm script ที่เตรียมไว้ใน package.json
+npm run tunnel
+
+# หรือวิธีที่ 2: รันคำสั่ง SSH โดยตรง
+ssh -o StrictHostKeyChecking=accept-new -t -R 80:localhost:3000 proxy.tunnl.gg
+
+# หรือต้องการ URL แบบ Stable คงที่ (ผูกกับ SSH Key ของบอร์ด)
+npm run tunnel:stable
+```
+
+เมื่อเชื่อมต่อสำเร็จ หน้าจอ Terminal จะแสดง URL สาธารณะแบบ HTTPS ทันที เช่น:
+```text
+Tunnel established!
+Public URL : https://xyz123.tunnl.gg
+```
+
+### 8.2 การนำ URL ไปใส่ใน Claude Desktop บนคอมพิวเตอร์ภายนอก
+เปิดไฟล์ตั้งค่า `%APPDATA%\Claude\claude_desktop_config.json` (บน Windows) หรือ `~/Library/Application Support/Claude/claude_desktop_config.json` (บน Mac) แล้วใส่:
+```json
+{
+  "mcpServers": {
+    "raspberry-pi-iot": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://xyz123.tunnl.gg/sse"
+      ]
+    }
+  }
+}
+```
+*(เปลี่ยน `https://xyz123.tunnl.gg` เป็น URL จริงที่ได้จากหน้าจอ terminal ของ Pi)*
+
+เพียงเท่านี้ AI ภายนอกไม่ว่าจะอยู่ที่ไหน ก็สามารถสั่งงานเปิด/ปิดไฟ และอ่านค่าเซนเซอร์ของ Raspberry Pi ได้ตลอดเวลาครับ

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>50 ข้อสอบทบทวนรวม: IT Infrastructure Security (ความยาวช้อยส์สมดุล)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.5); }
+    .code-font { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen p-3 md:p-6 select-none">
+  <div class="max-w-5xl mx-auto space-y-4">
+    
+    <!-- Top Header Card -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 md:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 flex-wrap mb-1">
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            06016421 IT/KMITL
+          </span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+            ชุดใหม่ 50 ข้อ (คละเนื้อหา)
+          </span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            ⚖️ ปรับช้อยส์ยาวเท่ากัน (Balanced Length)
+          </span>
+        </div>
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-[var(--foreground)]">
+          ชุดข้อสอบทบทวน 50 ข้อ (คละเนื้อหา & ปรับความยาวช้อยส์เท่ากัน)
+        </h1>
+        <p class="text-xs md:text-sm text-[var(--muted-foreground)] mt-0.5">
+          กดตอบแล้วรู้ผลทันที (Instant Answer) • ตัวเลือก A, B, C, D ความยาวสูสีกัน หลอกเนียนทุกข้อ
+        </p>
+      </div>
+
+      <!-- Quick Stats Widget -->
+      <div class="flex items-center gap-4 bg-[var(--background)] px-4 py-2.5 rounded-xl border border-[var(--border)] self-start md:self-auto">
+        <div class="text-center">
+          <div class="text-xs text-[var(--muted-foreground)]">ตอบถูก</div>
+          <div id="stat-correct" class="text-lg font-bold text-emerald-400">0</div>
+        </div>
+        <div class="h-8 w-px bg-[var(--border)]"></div>
+        <div class="text-center">
+          <div class="text-xs text-[var(--muted-foreground)]">ตอบผิด</div>
+          <div id="stat-wrong" class="text-lg font-bold text-rose-400">0</div>
+        </div>
+        <div class="h-8 w-px bg-[var(--border)]"></div>
+        <div class="text-center">
+          <div class="text-xs text-[var(--muted-foreground)]">ความแม่นยำ</div>
+          <div id="stat-accuracy" class="text-lg font-bold text-[var(--foreground)]">0%</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Category Filter Bar -->
+    <nav class="flex gap-2 overflow-x-auto pb-1 text-xs md:text-sm">
+      <button onclick="filterCategory('all')" id="tab-all" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm">
+        📚 ทั้งหมด (50 ข้อ)
+      </button>
+      <button onclick="filterCategory('Malware & Countermeasures')" id="tab-malware" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        Malware (6)
+      </button>
+      <button onclick="filterCategory('DoS/DDoS & Lab 4')" id="tab-dos" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        DoS & Lab 4 (7)
+      </button>
+      <button onclick="filterCategory('Cyber Attacks & Scanning Lab 3')" id="tab-scan" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        Scanning & Lab 3 (7)
+      </button>
+      <button onclick="filterCategory('IDPS & Lab 5')" id="tab-idps" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        IDPS & Lab 5 (7)
+      </button>
+      <button onclick="filterCategory('Firewall & Lab 6')" id="tab-fw" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        Firewall & Lab 6 (7)
+      </button>
+      <button onclick="filterCategory('Security Testing NIST SP 800-115')" id="tab-test" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        Testing (5)
+      </button>
+      <button onclick="filterCategory('VPN & Lab 7')" id="tab-vpn" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        VPN & Lab 7 (6)
+      </button>
+      <button onclick="filterCategory('Cloud Security & IAM')" id="tab-cloud" class="cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]">
+        Cloud & IAM (5)
+      </button>
+    </nav>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      
+      <!-- Left/Main: Active Question Card -->
+      <main class="lg:col-span-3 space-y-4">
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 md:p-7 shadow-sm space-y-6">
+          
+          <!-- Question Header & Badges -->
+          <div class="flex items-center justify-between border-b border-[var(--border)] pb-4 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span id="q-badge-category" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+                หมวดหมู่
+              </span>
+              <span id="q-counter" class="text-xs font-medium text-[var(--muted-foreground)]">
+                ข้อที่ 1 / 50
+              </span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="toggleMistakes()" id="btn-filter-mistake" class="px-2.5 py-1 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition flex items-center gap-1.5">
+                <span>❌ ดูเฉพาะข้อที่ตอบผิด</span>
+              </button>
+              <button onclick="resetAll()" class="px-2.5 py-1 rounded-lg text-xs font-medium border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition flex items-center gap-1.5" title="ล้างคำตอบทั้งหมด">
+                <span>🔄 รีเซ็ต</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Question Content -->
+          <div id="question-text" class="text-base md:text-lg font-medium leading-relaxed text-[var(--foreground)]">
+            กำลังโหลดคำถาม...
+          </div>
+
+          <!-- 4 Choices List -->
+          <div id="choices-container" class="space-y-3">
+            <!-- Choices inserted dynamically -->
+          </div>
+
+          <!-- Instant Feedback & Explanation Container -->
+          <div id="explanation-box" class="hidden rounded-xl border p-4 md:p-5 space-y-3 transition-all duration-300">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <div id="feedback-status" class="flex items-center gap-2 font-bold text-sm md:text-base">
+                <!-- Status icon + text -->
+              </div>
+              <button onclick="retryCurrent()" class="text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] underline flex items-center gap-1">
+                ลองตอบใหม่อีกครั้ง
+              </button>
+            </div>
+            <div class="h-px bg-current opacity-15"></div>
+            <div class="text-xs md:text-sm leading-relaxed space-y-1.5" id="explanation-content">
+              <!-- Explanation text -->
+            </div>
+          </div>
+
+          <!-- Bottom Navigation Controls -->
+          <div class="flex items-center justify-between pt-4 border-t border-[var(--border)] gap-2">
+            <button onclick="prevQ()" id="btn-prev" class="px-4 py-2.5 rounded-xl border border-[var(--border)] text-xs md:text-sm font-medium hover:bg-[var(--background)] transition flex items-center gap-2 disabled:opacity-30 disabled:pointer-events-none">
+              <span>⬅ ข้อก่อนหน้า</span>
+            </button>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="shuffleCurrent()" class="px-3 py-2 rounded-xl border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition flex items-center gap-1.5" title="สุ่มลำดับคำถาม">
+                <span>🔀 สุ่มข้อสอบ</span>
+              </button>
+            </div>
+
+            <button onclick="nextQ()" id="btn-next" class="px-5 py-2.5 rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)] text-xs md:text-sm font-semibold hover:opacity-90 transition flex items-center gap-2 disabled:opacity-30 disabled:pointer-events-none shadow-sm">
+              <span>ข้อถัดไป ➡</span>
+            </button>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Right: Question Palette / Navigator -->
+      <aside class="space-y-4">
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 md:p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+              แผงข้อสอบ (Palette)
+            </h3>
+            <span id="palette-progress" class="text-xs font-semibold text-[var(--foreground)]">
+              0/50
+            </span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-[var(--background)] rounded-full h-2 overflow-hidden border border-[var(--border)]">
+            <div id="progress-bar-fill" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+
+          <!-- Question Grid Numbers -->
+          <div id="palette-grid" class="grid grid-cols-5 gap-2 max-h-[350px] overflow-y-auto pr-1">
+            <!-- Button numbers injected via JS -->
+          </div>
+
+          <!-- Legend -->
+          <div class="pt-3 border-t border-[var(--border)] grid grid-cols-2 gap-2 text-xs text-[var(--muted-foreground)]">
+            <div class="flex items-center gap-1.5">
+              <div class="w-3 h-3 rounded-md bg-emerald-500/20 border border-emerald-500"></div>
+              <span>ถูกต้อง</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div class="w-3 h-3 rounded-md bg-rose-500/20 border border-rose-500"></div>
+              <span>ตอบผิด</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div class="w-3 h-3 rounded-md bg-[var(--background)] border border-[var(--border)]"></div>
+              <span>ยังไม่ตอบ</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div class="w-3 h-3 rounded-md ring-2 ring-blue-500 bg-[var(--card)]"></div>
+              <span>ข้อปัจจุบัน</span>
+            </div>
+          </div>
+
+          <!-- Shortcuts -->
+          <div class="bg-[var(--background)] rounded-xl p-2.5 border border-[var(--border)] text-xs text-[var(--muted-foreground)] space-y-1">
+            <div class="font-medium text-[var(--foreground)]">คีย์ลัด (Shortcuts):</div>
+            <div>• กดปุ่ม <kbd class="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-mono text-[10px]">A</kbd> <kbd class="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-mono text-[10px]">B</kbd> <kbd class="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-mono text-[10px]">C</kbd> <kbd class="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-mono text-[10px]">D</kbd> เพื่อตอบ</div>
+            <div>• กดลูกศร <kbd class="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-mono text-[10px]">←</kbd> <kbd class="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)] font-mono text-[10px]">→</kbd> เปลี่ยนข้อ</div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
+  <script>
+    const ALL_QUESTIONS = [{"id": "q1", "category": "Malware & Countermeasures", "question": "ตามมาตรฐาน NIST SP 800-83 ข้อใดอธิบายวัตถุประสงค์หลักของการใส่ Malware เข้าสู่ระบบได้ถูกต้อง?", "choices": {"A": "เพื่อลดภาระการประมวลผลของซีพียูและเพิ่มพื้นที่ว่างบนฮาร์ดดิสก์ให้สามารถรองรับไฟล์ข้อมูลขนาดใหญ่ได้ดี", "B": "เพื่อทำการทดสอบประสิทธิภาพของระบบเครือข่ายและวัดอัตราการส่งข้อมูลสูงสุดของอุปกรณ์ฮาร์ดแวร์ในองค์กร", "C": "เพื่อมุ่งทำลายคุณสมบัติความมั่นคงปลอดภัยด้าน Confidentiality, Integrity หรือ Availability ของระบบเหยื่อ", "D": "เพื่อทำการสำรองข้อมูลสำคัญของผู้ใช้งานไปยังคลาวด์ภายนอกแบบอัตโนมัติเมื่อระบบเกิดปัญหาขัดข้องกะทันหัน"}, "answer": "C", "explanation": "NIST SP 800-83 ระบุว่ามัลแวร์คือโปรแกรมที่ถูกใส่เข้าสู่ระบบโดยเจตนาแอบแฝงเพื่อทำลาย Confidentiality, Integrity หรือ Availability (CIA Triad) ของข้อมูลหรือระบบเหยื่อ"}, {"id": "q2", "category": "Malware & Countermeasures", "question": "ความแตกต่างสำคัญระหว่าง Polymorphic Virus และ Metamorphic Virus ในเชิงเทคนิคคือข้อใด?", "choices": {"A": "Polymorphic มีขนาดไฟล์คงที่ตลอดเวลา ส่วน Metamorphic มีขนาดไฟล์เปลี่ยนแปลงไปเรื่อยๆ ตามขนาดของหน่วยความจำ", "B": "Polymorphic เปลี่ยนแปลงเฉพาะ Decryption Routine ส่วน Metamorphic มีการ Rewrite โค้ดทั้งหมดใหม่ทุกการแพร่กระจาย", "C": "Polymorphic แพร่กระจายผ่านระบบเครือข่ายแลน ส่วน Metamorphic แพร่กระจายผ่านไฟล์เอกสารออฟฟิศและอีเมลภายนอก", "D": "Polymorphic ทำงานบนระบบปฏิบัติการวินโดวส์ ส่วน Metamorphic ทำงานบนระบบปฏิบัติการลินุกซ์และยูนิกซ์เท่านั้น"}, "answer": "B", "explanation": "Polymorphic Virus ใช้ Mutation Engine สร้าง Decryption Routine ใหม่เรื่อยๆ แต่ตัวไวรัสข้างในยังถอดรหัสออกมาเหมือนเดิม ส่วน Metamorphic Virus จะ Disassemble และ Rewrite โครงสร้างชุดคำสั่งทั้งหมดใหม่ทุกครั้ง"}, {"id": "q3", "category": "Malware & Countermeasures", "question": "กลไกการค้นหาเหยื่อของเวิร์มแบบ Topological Scanning มีลักษณะการทำงานตรงกับข้อใด?", "choices": {"A": "ใช้รายชื่อเป้าหมายที่มีช่องโหว่ซึ่งถูกเตรียมไว้ล่วงหน้า แล้วแบ่งรายชื่อส่งต่อให้โฮสต์ที่ติดเชื้อใหม่ช่วยสแกน", "B": "ใช้อัลกอริทึมสุ่มหมายเลขไอพีแอดเดรสทั่วโลกแบบ 32 บิตอย่างต่อเนื่อง เพื่อค้นหาพอร์ตที่เปิดรับการเชื่อมต่อ", "C": "ใช้ข้อมูลเครือข่ายและรายชื่อเครื่องที่มีอยู่แล้วในโฮสต์ของเหยื่อ เช่น ไฟล์ hosts หรือ web bookmarks ในการค้นหา", "D": "ใช้การบรอดคาสต์แพ็กเก็ตสำรวจเฉพาะภายในเครือข่าย Local Subnet เดียวกันเท่านั้น เพื่อเลี่ยงไฟร์วอลล์ภายนอก"}, "answer": "C", "explanation": "Topological scanning อาศัยข้อมูลที่มีอยู่ในเครื่องเหยื่อ (เช่น ข้อมูลในตาราง routing, hosts file, bookmarks หรือ contact lists) เพื่อหาเป้าหมายถัดไป"}, {"id": "q4", "category": "Malware & Countermeasures", "question": "ในมัลแวร์เรียกค่าไถ่ (Crypto-Ransomware) นิยมใช้สถาปัตยกรรมการเข้ารหัสรูปแบบใดเพื่อความรวดเร็วและปลอดภัยสูงสุด?", "choices": {"A": "ใช้ Asymmetric Encryption เข้ารหัสไฟล์ข้อมูลทุกไฟล์ในเครื่องโดยตรง เพื่อไม่ให้ต้องสร้างคีย์แบบสมมาตรขึ้นมา", "B": "ใช้ Symmetric Encryption เข้ารหัสไฟล์ในเครื่อง แล้วใช้ Asymmetric Key ของแฮกเกอร์เข้ารหัส Symmetric Key นั้นอีกชั้น", "C": "ใช้ Hash Function แบบ SHA-256 แปลงไฟล์ข้อมูลทั้งหมดเป็นค่าแฮชที่ไม่สามารถกู้คืนกลับมาเป็นข้อมูลดั้งเดิมได้", "D": "ใช้ Base64 Encoding ซ่อนเนื้อหาไฟล์ข้อมูลไว้ใน Registry เพื่อรอให้เหยื่อโอนเงินค่าไถ่ผ่านบัญชีธนาคารกลาง"}, "answer": "B", "explanation": "Crypto-Ransomware ใช้ Hybrid Encryption โดยใช้กุญแจสมมาตร (เช่น AES) เข้ารหัสไฟล์ขนาดใหญ่เพราะทำงานเร็วมาก แล้วใช้กุญแจอสมมาตรสาธารณะ (เช่น RSA Public Key) ของแฮกเกอร์เข้ารหัสกุญแจ AES ซ้ำอีกรอบ"}, {"id": "q5", "category": "Malware & Countermeasures", "question": "Rootkit ชนิดใดที่ทำงานในระดับต่ำกว่าระบบปฏิบัติการ (Sub-OS) และเข้าควบคุมระบบได้เบ็ดเสร็จที่สุด?", "choices": {"A": "User-mode Rootkit ที่ทำการ Hooking ผ่านฟังก์ชัน API ของระบบ เพื่อซ่อนโปรเซสในหน้าต่างโปรแกรม Task Manager", "B": "Kernel-mode หรือ Hypervisor/Firmware Rootkit ที่ฝังตัวในระดับ Ring 0 หรือตัวควบคุมฮาร์ดแวร์เพื่อดักจับ System Calls", "C": "Application-level Rootkit ที่ทำการแทนที่ไฟล์ไบนารีมาตรฐาน เช่น คำสั่ง ls หรือ ps ด้วยโปรแกรมอันตรายตัวใหม่", "D": "Script-based Rootkit ที่เขียนด้วยภาษาเชลล์สคริปต์และรันทำงานเป็นเซอร์วิสพื้นหลังในโฟลเดอร์สำหรับเก็บไฟล์ชั่วคราว"}, "answer": "B", "explanation": "Kernel-mode (Ring 0) และ Hypervisor (Ring -1) หรือ Firmware Rootkit ทำงานในระดับสิทธิ์สูงสุด ใต้หรือระดับเดียวกับ OS เคอร์เนล จึงสามารถดักจับการเรียกใช้คำสั่งระบบและซ่อนตัวจากการตรวจสอบของ Antivirus ทั่วไปได้อย่างสมบูรณ์"}, {"id": "q6", "category": "Malware & Countermeasures", "question": "ตามตำราของ Stallings เทคโนโลยีตรวจจับมัลแวร์รุ่นที่ 3 (Third-Generation Antivirus) โดดเด่นด้วยกลไกใด?", "choices": {"A": "การเปรียบเทียบชุดข้อความตัวอักษรคงที่ (Simple Signature Scanner) ในไฟล์ข้อมูลเพื่อระบุชนิดของไวรัสคอมพิวเตอร์", "B": "การใช้กลไกกับดักพฤติกรรม (Activity Traps) ดักจับในหน่วยความจำเพื่อยับยั้งโปรแกรมต้องสงสัยที่พยายามแก้ไขระบบ", "C": "การใช้กฎความน่าจะเป็น (Heuristics) ร่วมกับการตรวจสอบความถูกต้องของผลรวมไฟล์ข้อมูลเพื่อตรวจจับสิ่งผิดปกติ", "D": "การผสานระบบป้องกันเต็มรูปแบบ (Full-Featured Protection) ด้วยการวิเคราะห์พฤติกรรมในแซนด์บ็อกซ์และคลาวด์"}, "answer": "B", "explanation": "รุ่น 1 = Simple signatures, รุ่น 2 = Heuristic rules & integrity checking, รุ่น 3 = Activity traps (ตรวจจับพฤติกรรมน่าสงสัยแบบ real-time ในหน่วยความจำ), รุ่น 4 = Full-featured behavior blocking & sandbox analysis"}, {"id": "q7", "category": "DoS/DDoS & Lab 4", "question": "คำสั่ง hping3 ข้อใดใช้ยิงทราฟฟิกแบบ ICMP Flood ด้วยความเร็วสูงสุดตรงตามใบงานการทดลอง Lab 4?", "choices": {"A": "hping3 x.x.x.x -0 --flood", "B": "hping3 x.x.x.x -1 --flood", "C": "hping3 x.x.x.x -2 --flood", "D": "hping3 x.x.x.x -S --flood"}, "answer": "B", "explanation": "ใน hping3 ออปชัน `-1` ใช้เลือกโหมด ICMP (ค่าเริ่มต้นคือ Echo Request) และ `--flood` คือยิงแพ็กเก็ตออกไปอย่างเร็วที่สุดโดยไม่พิมพ์ผลตอบรับหน้าจอ"}, {"id": "q8", "category": "DoS/DDoS & Lab 4", "question": "หากต้องการยิงทราฟฟิก TCP SYN Flood ไปยังพอร์ต 80 พร้อมสุ่ม IP แหล่งกำเนิดด้วย hping3 ต้องใช้คำสั่งใด?", "choices": {"A": "hping3 -A -p 80 --flood --rand-source x.x.x.x", "B": "hping3 -1 -p 80 --flood --rand-source x.x.x.x", "C": "hping3 -2 -p 80 --flood --rand-source x.x.x.x", "D": "hping3 -S -p 80 --flood --rand-source x.x.x.x"}, "answer": "D", "explanation": "`-S` กำหนดแฟล็ก TCP SYN, `-p 80` ระบุพอร์ตปลายทาง 80, `--flood` โหมส่งเร็วสูงสุด, และ `--rand-source` สุ่ม Source IP address"}, {"id": "q9", "category": "DoS/DDoS & Lab 4", "question": "ในคำสั่งรัน Server ของ iperf3 ใน Lab 4: `iperf -s -B x.x.x.x` พารามิเตอร์ `-B` มีหน้าที่สำคัญอย่างไร?", "choices": {"A": "กำหนดขนาดของบัฟเฟอร์หน่วยความจำในการรับส่งข้อมูล", "B": "จำกัดปริมาณแบนด์วิดท์สูงสุดที่อนุญาตให้ส่งเข้ามาได้", "C": "ผูกการทำงานของเซิร์ฟเวอร์เข้ากับหมายเลขไอพีที่กำหนด", "D": "สั่งให้โปรแกรมทำงานเป็นแบคกราวนด์เซอร์วิสในระบบ"}, "answer": "C", "explanation": "พารามิเตอร์ `-B <ip>` (Bind) ใช้ผูกบริการ iperf เข้ากับอินเทอร์เฟซหรือ IP Address ที่ระบุเจาะจงของเครื่องตนเอง"}, {"id": "q10", "category": "DoS/DDoS & Lab 4", "question": "จากคำสั่งฝั่ง Observer ใน Lab 4-A: `iperf3 -c x.x.x.x -b 1M -t 30 -u` พารามิเตอร์ `-b 1M` หมายถึงข้อใด?", "choices": {"A": "กำหนดอัตราการส่งข้อมูลเป้าหมายเท่ากับ 1 Megabit ต่อวินาที", "B": "กำหนดขนาดบัฟเฟอร์ในการส่งข้อมูลเท่ากับ 1 Megabyte ต่อรอบ", "C": "กำหนดจำนวนบล็อกของข้อมูลสูงสุดไม่เกิน 1 ล้านแพ็กเก็ตทดสอบ", "D": "กำหนดการเชื่อมต่อพร้อมกันสูงสุดของไคลเอนต์ไม่เกิน 1 ครั้ง"}, "answer": "A", "explanation": "`-b 1M` คือการกำหนด Target Bandwidth ที่อัตรา 1 Mbit/sec สำหรับการส่งทราฟฟิกทดสอบ"}, {"id": "q11", "category": "DoS/DDoS & Lab 4", "question": "ใน Lab 4-A เมื่อทดสอบทราฟฟิก UDP ระหว่างเกิด DoS พารามิเตอร์หลัก 3 ตัวที่ต้องบันทึกที่ฝั่ง Receiver คืออะไร?", "choices": {"A": "CPU Usage, Memory Utilization และ Disk Latency", "B": "Retransmit Count, Round Trip Time และ Window Size", "C": "Bit Rate, Packet Loss Rate และ Jitter ของทราฟฟิก", "D": "TCP Flags, Sequence Number และ Acknowledgment Number"}, "answer": "C", "explanation": "ใน Lab 4-A ระบุชัดเจนให้บันทึก Bit Rate, Loss Rate, และ Jitter ที่วัดได้จากฝั่ง Receiver เนื่องจาก UDP เป็น Connectionless protocol"}, {"id": "q12", "category": "DoS/DDoS & Lab 4", "question": "เหตุใดใบงาน Lab 4 จึงเน้นย้ำว่า: \"ก่อนเริ่มใช้ hping3 ให้เอา Default Route ออกให้หมดก่อน\"?", "choices": {"A": "เพื่อเพิ่มความเร็วในการยิงแพ็กเก็ตของโปรแกรม hping3 ให้เร็วขึ้นเป็นสองเท่า", "B": "เพื่อป้องกันไม่ให้แพ็กเก็ตที่ยิงโจมตีหลุดรอดออกไปรบกวนโครงข่ายภายนอกของสถาบัน", "C": "เพื่อหลีกเลี่ยงการถูกระบบไฟร์วอลล์ของเครื่องตนเองทำการบล็อกคำสั่งทดสอบ", "D": "เพื่อบังคับให้เครื่องคอมพิวเตอร์สลับไปใช้การส่งข้อมูลผ่านการ์ดแลนไร้สายแทน"}, "answer": "B", "explanation": "การลบ Default Route เป็นมาตรการความปลอดภัยเครือข่าย เพื่อป้องกันไม่ให้ทราฟฟิก DoS/Flooding หลุดออกทาง Gateway ไปรบกวนโครงข่ายส่วนกลางของมหาวิทยาลัย"}, {"id": "q13", "category": "DoS/DDoS & Lab 4", "question": "การโจมตีแบบ SYN Spoofing ส่งผลกระทบต่อโครงสร้างหน่วยความจำส่วนใดของระบบปฏิบัติการเซิร์ฟเวอร์เป้าหมาย?", "choices": {"A": "ตาราง Connection Backlog Queue สำหรับรอรับการเชื่อมต่อที่ค้างอยู่", "B": "ตารางแคชของระบบ Domain Name System บนเครื่องคอมพิวเตอร์แม่ข่าย", "C": "ตารางแปลงที่อยู่ของ Address Resolution Protocol ในหน่วยความจำหลัก", "D": "ตารางเส้นทางการส่งต่อแพ็กเก็ตของเคอร์เนลระบบปฏิบัติการเป้าหมาย"}, "answer": "A", "explanation": "SYN Spoofing ทำให้เกิด Half-Open Connections ค้างอยู่ใน Backlog Queue จนพื้นที่เต็ม ทำให้เซิร์ฟเวอร์ไม่สามารถเปิดรับการเชื่อมต่อใหม่จากผู้ใช้ทั่วไปได้"}, {"id": "q14", "category": "Cyber Attacks & Scanning Lab 3", "question": "คำสั่ง `nmap -sS` แตกต่างจากคำสั่ง `nmap -sT` ในแง่ของกระบวนการส่งแพ็กเก็ตอย่างไร?", "choices": {"A": "`nmap -sS` สแกนพอร์ตแบบ UDP ส่วน `nmap -sT` สแกนพอร์ตแบบ TCP โดยส่งแพ็กเก็ตปกติ", "B": "`nmap -sS` ใช้ตรวจสอบเวอร์ชันบริการ ส่วน `nmap -sT` ใช้ตรวจสอบชนิดระบบปฏิบัติการของโฮสต์", "C": "`nmap -sS` สแกนช้ากว่าเพื่อหลบไฟร์วอลล์ ส่วน `nmap -sT` สแกนเร็วกว่าโดยไม่สนใจบันทึกล็อก", "D": "`nmap -sS` ไม่จบ 3-Way Handshake ส่วน `nmap -sT` ทำการเชื่อมต่อ 3-Way Handshake ครบถ้วน"}, "answer": "D", "explanation": "`-sS` (SYN Stealth) เมื่อได้รับ SYN-ACK จะส่ง RST ปิดทันทีโดยไม่ส่ง ACK สุดท้าย ทำให้แอปพลิเคชันส่วนใหญ่ไม่บันทึกล็อก ส่วน `-sT` ใช้ฟังก์ชัน connect() ทำ Handshake สมบูรณ์"}, {"id": "q15", "category": "Cyber Attacks & Scanning Lab 3", "question": "ในการทำ UDP Port Scan ด้วย Nmap (`nmap -sU`) หากพอร์ตปลายทางปิดอยู่ ระบบจะตอบกลับด้วยสิ่งใด?", "choices": {"A": "แพ็กเก็ต TCP RST ยืนยันว่าพอร์ตดังกล่าวไม่ได้เปิดให้บริการในระบบ", "B": "แพ็กเก็ต ICMP Port Unreachable (Type 3, Code 3) จากโฮสต์เป้าหมาย", "C": "ไม่มีการตอบกลับใดๆ กลับมายังเครื่องสแกนเนอร์ตลอดช่วงเวลา Timeout", "D": "แพ็กเก็ต UDP Handshake Response แจ้งสถานะการปฏิเสธการเชื่อมต่อ"}, "answer": "B", "explanation": "ตามมาตรฐานเครือข่าย เมื่อส่ง UDP packet ไปยังพอร์ตที่ไม่มีบริการเปิดรับฟัง โฮสต์ปลายทางจะตอบกลับด้วยข้อความ ICMP Destination Unreachable / Port Unreachable (Type 3 Code 3)"}, {"id": "q16", "category": "Cyber Attacks & Scanning Lab 3", "question": "หากต้องการตรวจสอบว่าเครื่องใน Subnet ใดเปิดอยู่บ้าง โดยไม่ทำ Port Scan เลย ต้องใช้คำสั่งใด?", "choices": {"A": "nmap -sn 20.X.1.0/24", "B": "nmap -Pn 20.X.1.0/24", "C": "nmap -sV 20.X.1.0/24", "D": "nmap -p- 20.X.1.0/24"}, "answer": "A", "explanation": "ออปชัน `-sn` (No port scan หรือเดิมคือ `-sP`) เป็นคำสั่ง Ping Sweep ทำ Host Discovery เพียงอย่างเดียวโดยไม่สแกนพอร์ต"}, {"id": "q17", "category": "Cyber Attacks & Scanning Lab 3", "question": "ใน Lab 3-A ต้องการสแกนเฉพาะพอร์ต 8080 และ 2025 ของวงเครือข่าย 20.X.1.0/24 ไวยากรณ์ที่ถูกต้องคือข้อใด?", "choices": {"A": "nmap -ports (8080 2025) 20.X.1.0/24", "B": "nmap --ports 8080-2025 20.X.1.0/24", "C": "nmap -P:8080:2025 20.X.1.0/24", "D": "nmap -p 8080,2025 20.X.1.0/24"}, "answer": "D", "explanation": "ใน Nmap ระบุหมายเลขพอร์ตด้วย `-p` คั่นด้วยเครื่องหมายจุลภาค (,) เช่น `-p 8080,2025`"}, {"id": "q18", "category": "Cyber Attacks & Scanning Lab 3", "question": "หากต้องการสแกนพอร์ต TCP ทุกพอร์ตที่เป็นไปได้ทั้งหมด (1 ถึง 65535) ต้องระบุพารามิเตอร์อย่างไร?", "choices": {"A": "-p all", "B": "-p 1-65535 หรือ -p-", "C": "-p full", "D": "-p 0-65536"}, "answer": "B", "explanation": "`-p-` เป็นชอร์ตคัตของ Nmap ที่มีความหมายเท่ากับ `-p 1-65535` ซึ่งครอบคลุมทุกพอร์ต TCP ที่มีอยู่ในระบบ"}, {"id": "q19", "category": "Cyber Attacks & Scanning Lab 3", "question": "ขั้นตอนใดใน Cyber Kill Chain ของ Lockheed Martin ที่แฮกเกอร์ทำการประกอบ Exploit เข้ากับ Payload?", "choices": {"A": "Weaponization", "B": "Reconnaissance", "C": "Delivery", "D": "Exploitation"}, "answer": "A", "explanation": "Weaponization คือขั้นตอนที่นำมัลแวร์หรือเพย์โหลดมาบรรจุเข้ากับช่องโหว่ (เช่น ทำไฟล์เอกสาร Word ฝังโทรจัน) ก่อนจะนำไปจัดส่ง (Delivery)"}, {"id": "q20", "category": "Cyber Attacks & Scanning Lab 3", "question": "ตามโมเดล STRIDE ภัยคุกคามประเภท Tampering และ Repudiation เกี่ยวข้องกับข้อใดตามลำดับ?", "choices": {"A": "การแก้ไขเปลี่ยนแปลงข้อมูล และการปฏิเสธความรับผิดชอบ", "B": "การปลอมแปลงตัวตนผู้ใช้ และการขโมยไฟล์ข้อมูลสำคัญ", "C": "การทำให้ระบบหยุดทำงาน และการเข้าควบคุมสิทธิ์สูงสุด", "D": "การดักฟังแพ็กเก็ตในสาย และการติดตั้งไวรัสในระบบ"}, "answer": "A", "explanation": "T = Tampering (การแก้ไขดัดแปลงข้อมูล ทำลาย Integrity) และ R = Repudiation (การปฏิเสธการกระทำ/ความรับผิดชอบ)"}, {"id": "q21", "category": "IDPS & Lab 5", "question": "โครงสร้างมาตรฐานของ Rule Header ในระบบ Snort ประกอบด้วยลำดับข้อมูลตามข้อใดถูกต้องที่สุด?", "choices": {"A": "Action, Protocol, Source IP, Source Port, Direction, Destination IP, Destination Port", "B": "Protocol, Action, Source IP, Destination IP, Source Port, Destination Port, Direction", "C": "Action, Source IP, Destination IP, Protocol, Source Port, Destination Port, Direction", "D": "Direction, Action, Protocol, Source Port, Source IP, Destination Port, Destination IP"}, "answer": "A", "explanation": "รูปแบบ Rule Header ของ Snort: `action proto src_ip src_port -> dst_ip dst_port` เช่น `alert tcp any any -> 192.168.1.1 80`"}, {"id": "q22", "category": "IDPS & Lab 5", "question": "ใน Rule Options ของ Snort ช่วงหมายเลข sid (Snort ID) ใดที่สงวนไว้สำหรับกฎที่ผู้ใช้สร้างขึ้นเอง (Custom Rules)?", "choices": {"A": "sid 1 ถึง 99", "B": "sid 100 ถึง 999", "C": "sid 50,000 ถึง 99,999", "D": "sid 1,000,000 ขึ้นไป"}, "answer": "D", "explanation": "sid ต่ำกว่า 100 สงวนไว้, sid 100 - 999,999 สำหรับกฎมาตรฐานจาก Talos, ส่วน sid ตั้งแต่ 1,000,000 ขึ้นไปจัดไว้สำหรับ Local/Custom Rules ของผู้ใช้งาน"}, {"id": "q23", "category": "IDPS & Lab 5", "question": "ใน Lab 5-A กฎ Snort Rule สำหรับตรวจจับการ Ping (ICMP Echo Request) ต้องกำหนดออปชันใดในวงเล็บ?", "choices": {"A": "itype:8;", "B": "itype:0;", "C": "icode:3;", "D": "icmp_seq:1;"}, "answer": "A", "explanation": "การ Ping คือการส่ง ICMP Echo Request ซึ่งมีค่า ICMP Type เท่ากับ 8 ใน Snort จึงใช้ออปชัน `itype:8;` (ส่วน Type 0 คือ Echo Reply)"}, {"id": "q24", "category": "IDPS & Lab 5", "question": "บนระบบปฏิบัติการ Linux ไฟล์สำหรับกำหนดกฎของผู้ดูแลระบบ (Local Rules) ของ Snort มักจัดเก็บอยู่ที่พาธใด?", "choices": {"A": "/var/log/snort/local.rules", "B": "/etc/snort/rules/local.rules", "C": "/usr/bin/snort/local.rules", "D": "/opt/snort/etc/local.rules"}, "answer": "B", "explanation": "ไดเรกทอรีเก็บกฎมาตรฐานของ Snort คือ `/etc/snort/rules/` และไฟล์สำหรับเขียนกฎเฉพาะของตนเองคือ `/etc/snort/rules/local.rules`"}, {"id": "q25", "category": "IDPS & Lab 5", "question": "คำสั่ง CLI ในการรัน Snort เพื่อทดสอบแสดงผล Alert ออกทางหน้าจอ Console โดยกำหนดไฟล์คอนฟิกคือคำสั่งใด?", "choices": {"A": "snort -T -d /var/log/snort/snort.log -i eth1", "B": "snort -D --log /etc/snort/rules/local.rules -i eth1", "C": "snort -A console -q -c /etc/snort/snort.conf -i eth1", "D": "snort -s --start /etc/snort/snort.lua -dev eth1"}, "answer": "C", "explanation": "`-A console` ให้แสดง Alert บนหน้าจอทันที, `-q` โหมดเงียบ (ไม่พิมพ์แบนเนอร์), `-c <path>` ชี้ไฟล์คอนฟิกหลัก, และ `-i <interface>` กำหนดอินเทอร์เฟซ"}, {"id": "q26", "category": "IDPS & Lab 5", "question": "ข้อใดเป็นวิธีการเชื่อมต่อที่ใช้เพื่อส่งสำเนาของทราฟฟิกจริงไปให้เซ็นเซอร์แบบ Passive IDS ตรวจสอบ?", "choices": {"A": "การติดตั้ง Proxy Gateway คั่นกลางสายสัญญาณเครือข่ายทุกเส้น", "B": "การใช้งาน Spanning Port (SPAN/Mirroring) บนอุปกรณ์สวิตช์", "C": "การตั้งค่าให้เซิร์ฟเวอร์ทุกเครื่องเปิดโหมด Port Forwarding", "D": "การเปิดใช้งาน Dynamic Routing Protocol ข้ามเครือข่ายภายนอก"}, "answer": "B", "explanation": "สไลด์ระบุ 3 วิธีเชื่อมต่อ Passive Sensor คือ Spanning Port (SPAN), Network TAP, และ IDS Load Balancer"}, {"id": "q27", "category": "IDPS & Lab 5", "question": "ข้อจำกัดสำคัญของเทคนิค Session Sniping ที่ใช้ในการป้องกันภัยคุกคามบน Passive IDS คือข้อใด?", "choices": {"A": "จำเป็นต้องใช้สิทธิ์ผู้ดูแลระบบระดับสูงสุดในการรีบูตเครื่องคอมพิวเตอร์เป้าหมาย", "B": "ใช้ได้เฉพาะกับสายใยแก้วนำแสงเท่านั้น และไม่รองรับสายสัญญาณทองแดงแบบดั้งเดิม", "C": "ใช้ได้เฉพาะกับโพรโทคอล TCP เท่านั้น และแพ็กเก็ต RST มักไปถึงช้ากว่าทราฟฟิกโจมตี", "D": "ทำให้ระบบปฏิบัติการของผู้ดูแลระบบเกิดจอฟ้าทันทีเมื่อตรวจพบการส่งข้อมูลผิดปกติ"}, "answer": "C", "explanation": "Session Sniping ส่ง TCP RST ไปหลอกปลายทางทั้งสองข้าง จึงใช้ได้เฉพาะ TCP (ใช้กับ UDP/ICMP ไม่ได้) และ RST มักส่งไปถึงช้าเกินไปหลังการโจมตีสำเร็จแล้ว"}, {"id": "q28", "category": "Firewall & Lab 6", "question": "ในระบบ iptables ของ Linux ตาราง (Table) ใดเป็นค่าเริ่มต้นสำหรับการคัดกรองแพ็กเก็ต (Packet Filtering)?", "choices": {"A": "nat", "B": "raw", "C": "mangle", "D": "filter"}, "answer": "D", "explanation": "ตาราง `filter` เป็น Default Table ของ iptables มี 3 Chains หลักคือ INPUT, OUTPUT, และ FORWARD"}, {"id": "q29", "category": "Firewall & Lab 6", "question": "ใน iptables Chain ใดทำหน้าที่ตรวจสอบแพ็กเก็ตที่วิ่งผ่านเครื่องลินุกซ์นี้เพื่อไปยังเครือข่ายปลายทางอื่น?", "choices": {"A": "FORWARD", "B": "INPUT", "C": "OUTPUT", "D": "PREROUTING"}, "answer": "A", "explanation": "INPUT สำหรับแพ็กเก็ตเข้าหาเครื่อง Local, OUTPUT สำหรับแพ็กเก็ตสร้างจากเครื่อง Local, ส่วน FORWARD สำหรับแพ็กเก็ตที่วิ่งผ่านเครื่องไปที่อื่น (Routed traffic)"}, {"id": "q30", "category": "Firewall & Lab 6", "question": "คำสั่ง iptables ในข้อใดที่อนุญาตให้ทราฟฟิกตอบกลับของการเชื่อมต่อเดิมที่เคยเปิดไว้วิ่งผ่านได้ (Stateful Rule)?", "choices": {"A": "iptables -A FORWARD --return-traffic permit -j ACCEPT", "B": "iptables -A INPUT -p tcp --stateful-inspection -j ACCEPT", "C": "iptables -I OUTPUT -m connection-track --status ACTIVE -j ACCEPT", "D": "iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT"}, "answer": "D", "explanation": "การทำ Stateful Inspection ใน iptables ใช้โมดูล `-m state --state ESTABLISHED,RELATED -j ACCEPT` เพื่อยอมให้ Return Traffic วิ่งผ่านได้อัตโนมัติ"}, {"id": "q31", "category": "Firewall & Lab 6", "question": "คำสั่ง iptables ใดใช้ตั้งค่านโยบายเริ่มต้น (Default Policy) ของ Chain INPUT ให้ปฏิเสธทราฟฟิกทั้งหมด (Default Deny)?", "choices": {"A": "iptables -P INPUT DROP", "B": "iptables -D INPUT ALL", "C": "iptables -F INPUT REJECT", "D": "iptables -A INPUT -j BLOCK"}, "answer": "A", "explanation": "ออปชัน `-P` (Policy) ใช้กำหนดพฤติกรรมเริ่มต้นของ Chain เช่น `iptables -P INPUT DROP` ตามหลัก Implicit/Default Deny"}, {"id": "q32", "category": "Firewall & Lab 6", "question": "บนระบบปฏิบัติการ Debian/Ubuntu ไฟล์สำหรับเก็บกฎ iptables แบบถาวรหลังรีบูตระบบคือไฟล์ใด?", "choices": {"A": "/usr/lib/iptables.conf", "B": "/var/log/iptables.rules", "C": "/etc/default/firewall.cfg", "D": "/etc/iptables/rules.v4"}, "answer": "D", "explanation": "เมื่อใช้ `iptables-persistent` ไฟล์เก็บกฎ IPv4 ถาวรคือ `/etc/iptables/rules.v4` (และ `/etc/iptables/rules.v6` สำหรับ IPv6)"}, {"id": "q33", "category": "Firewall & Lab 6", "question": "ใน Lab 6-A คำสั่ง FortiGate CLI ใดที่ใช้เปิดให้อินเทอร์เฟซรองรับการจัดการผ่าน Ping, HTTPS, SSH และ HTTP?", "choices": {"A": "set allowaccess ping https ssh http", "B": "permit admin-protocol icmp 443 22 80", "C": "enable management-interface all-port", "D": "set admin-service ping web ssh terminal"}, "answer": "A", "explanation": "ใน FortiOS โหมด `config system interface` ใช้คำสั่ง `set allowaccess ping https ssh http` เพื่ออนุญาตโปรโตคอลบริหารจัดการ"}, {"id": "q34", "category": "Firewall & Lab 6", "question": "ใน Lab 6-B กำหนดให้สร้าง Firewall Policy โดยไม่ใช้ NAT คำสั่ง FortiGate CLI ข้อใดใช้ปิดการทำงานของ NAT?", "choices": {"A": "set nat disable", "B": "no nat enable", "C": "disable nat-service", "D": "nat off"}, "answer": "A", "explanation": "ใน `config firewall policy` ของ FortiGate เมื่อไม่ต้องการใช้ NAT ให้ระบุคำสั่ง `set nat disable`"}, {"id": "q35", "category": "Security Testing NIST SP 800-115", "question": "ตามมาตรฐาน NIST SP 800-115 ขั้นตอนการประเมินความมั่นคงปลอดภัยแบ่งออกเป็น 3 ขั้นตอนหลักตามข้อใด?", "choices": {"A": "Reconnaissance, Exploitation และ Reporting", "B": "Planning, Execution และ Post-Execution", "C": "Preparation, Penetration และ Recovery", "D": "Review, Identification และ Mitigation"}, "answer": "B", "explanation": "NIST SP 800-115 กำหนด Methodology เป็น 3 Phases คือ: 1. Planning, 2. Execution, 3. Post-Execution"}, {"id": "q36", "category": "Security Testing NIST SP 800-115", "question": "ส่วนประกอบหมวด Logistics & Personnel ในเอกสาร Rules of Engagement (ROE) ต้องระบุสิ่งใด?", "choices": {"A": "สำเนาใบเสร็จรับเงินค่าจ้างและเอกสารหักภาษี ณ ที่จ่ายของผู้เชี่ยวชาญด้านความปลอดภัย", "B": "ตารางข้อมูลสเปกฮาร์ดแวร์และยี่ห้อของอุปกรณ์สแกนเนอร์ที่ผู้ทดสอบพกพาเข้ามาในสถานที่", "C": "รายชื่อและข้อมูลติดต่อ (Points of Contact) ของทีมทดสอบ ผู้บริหาร และทีม Incident Response", "D": "รหัสผ่านและสิทธิ์การเข้าถึงระดับสูงสุดของระบบฐานข้อมูลหลักเพื่อความสะดวกในการทดสอบ"}, "answer": "C", "explanation": "ROE Template หมวด Logistics & Personnel ต้องระบุรายชื่อและเบอร์ติดต่อ (Points of Contact) ของทั้งทีมผู้ประเมิน ฝ่ายบริหาร และทีมรับมือเหตุฉุกเฉิน (Incident Response Team)"}, {"id": "q37", "category": "Security Testing NIST SP 800-115", "question": "กิจกรรมในข้อใดต่อไปนี้จัดอยู่ในกลุ่ม Review Techniques ตามมาตรฐาน NIST SP 800-115?", "choices": {"A": "Password Cracking, Social Engineering และ Target Vulnerability Penetration Testing", "B": "Network Discovery, Network Port Identification และ Automated Vulnerability Scanning", "C": "Documentation Review, Log Review, Ruleset Review และ System Configuration Review", "D": "Wireless Sniffing, War Driving และ Web Application SQL Injection Exploitation"}, "answer": "C", "explanation": "Review Techniques เป็นการตรวจเชิงเอกสารและการตั้งค่า ได้แก่ ตรวจเอกสาร ตรวจสอบล็อก ตรวจชุดกฎไฟร์วอลล์ และตรวจคอนฟิกของระบบ"}, {"id": "q38", "category": "Security Testing NIST SP 800-115", "question": "การทดสอบเจาะระบบแบบ Black Box Testing มีลักษณะเด่นที่สำคัญอย่างไร?", "choices": {"A": "ผู้ทดสอบทำการทดสอบเฉพาะระบบเครือข่ายไร้สายและระบบสำรองไฟฟ้าของดาต้าเซ็นเตอร์", "B": "ผู้ทดสอบได้รับซอร์สโค้ดและผังระบบเครือข่ายอย่างละเอียด เพื่อค้นหาจุดบกพร่องเชิงลึก", "C": "ผู้ทดสอบได้รับบัญชีผู้ใช้งานทั่วไป เพื่อจำลองการกระทำผิดของพนักงานภายในองค์กร", "D": "ผู้ทดสอบไม่มีข้อมูลหรือความรู้ล่วงหน้าเกี่ยวกับระบบเลย เพื่อจำลองการโจมตีจากภายนอก"}, "answer": "D", "explanation": "Black Box คือการทดสอบที่ผู้ทดสอบไม่มีข้อมูลภายในใดๆ (Zero knowledge) เพื่อจำลองมุมมองของแฮกเกอร์ภายนอกอย่างแท้จริง"}, {"id": "q39", "category": "Security Testing NIST SP 800-115", "question": "เป้าหมายสำคัญที่สุดของการทำ Root Cause Analysis (RCA) ในขั้นตอน Post-Execution คือข้อใด?", "choices": {"A": "เพื่อคำนวณมูลค่าความเสียหายเป็นตัวเงินและส่งข้อมูลให้บริษัทประกันภัยเพื่อเรียกร้องสินไหม", "B": "เพื่อหาตัวผู้รับผิดชอบที่กระทำความผิดในการตั้งค่าระบบและดำเนินการลงโทษทางวินัย", "C": "เพื่อระบุต้นตอของปัญหาในระดับกระบวนการหรือนโยบาย มากกว่าการแก้ปัญหาเฉพาะหน้ารายจุด", "D": "เพื่อนำช่องโหว่ที่ค้นพบไปเผยแพร่ในฐานข้อมูลสาธารณะให้องค์กรอื่นนำไปเป็นกรณีศึกษา"}, "answer": "C", "explanation": "RCA มุ่งหาสาเหตุที่แท้จริงในระดับ Program/Policy (เช่น ขาดการอบรม หรือขาดนโยบาย Patch Management) เพื่อแก้ปัญหาที่รากเหง้าอย่างยั่งยืน"}, {"id": "q40", "category": "VPN & Lab 7", "question": "ตามมาตรฐาน NIST SP 800-77 โพรโทคอล IPsec ทำงานในระดับเลเยอร์ใดของแบบจำลอง OSI Model?", "choices": {"A": "Data Link Layer (Layer 2)", "B": "Transport Layer (Layer 4)", "C": "Network Layer (Layer 3)", "D": "Application Layer (Layer 7)"}, "answer": "C", "explanation": "IPsec เป็นกลไกความปลอดภัยระดับ Network Layer (Layer 3) ทำให้มีความโปร่งใสต่อแอปพลิเคชันทุกชนิดที่ทำงานอยู่ด้านบน"}, {"id": "q41", "category": "VPN & Lab 7", "question": "ความแตกต่างหลักระหว่างโพรโทคอล AH (Protocol 51) และ ESP (Protocol 50) ใน IPsec คือข้อใด?", "choices": {"A": "AH ทำงานเฉพาะบนเครือข่ายไร้สาย ส่วน ESP ทำงานเฉพาะบนสายใยแก้วนำแสงความเร็วสูง", "B": "AH เข้ารหัสข้อมูลอย่างเดียว ส่วน ESP ทำหน้าที่ยืนยันตัวตนของจุดปลายทางอย่างเดียว", "C": "AH ตรวจสอบความถูกต้องแต่ไม่เข้ารหัส ส่วน ESP ตรวจสอบความถูกต้องและเข้ารหัสข้อมูล", "D": "AH ใช้งานใน Transport Mode ได้เท่านั้น ส่วน ESP ใช้งานใน Tunnel Mode ได้เท่านั้น"}, "answer": "C", "explanation": "AH (Protocol 51) ให้เฉพาะ Integrity & Authentication (ไม่เข้ารหัสข้อมูล) ส่วน ESP (Protocol 50) ให้ทั้ง Confidentiality (เข้ารหัส) และ Authentication"}, {"id": "q42", "category": "VPN & Lab 7", "question": "ใน IPsec การทำงานแบบ Tunnel Mode มีลักษณะการห่อหุ้มแพ็กเก็ตอย่างไร?", "choices": {"A": "คงส่วนหัว IP เดิมไว้และเข้ารหัสเฉพาะข้อมูลในเพย์โหลด มักใช้เชื่อมต่อแบบ Host-to-Host", "B": "เข้ารหัสเฉพาะฟิลด์พอร์ตต้นทางและพอร์ตปลายทางในเลเยอร์การขนส่งเพื่อซ่อนบริการ", "C": "แปลงแพ็กเก็ตเป็นสัญญาณเลเยอร์ 2 แล้วส่งผ่านทันเนลจำลองโดยไม่ต้องมี IP Header", "D": "เข้ารหัสแพ็กเก็ต IP เดิมทั้งก้อนแล้วสร้าง IP Header ใหม่ครอบทับ มักใช้แบบ Site-to-Site"}, "answer": "D", "explanation": "Tunnel Mode เข้ารหัส Original IP Packet ทั้งหมด (รวม Header เดิม) แล้วใส่ New Outer IP Header ครอบทับ มักใช้ในเกตเวย์ Site-to-Site"}, {"id": "q43", "category": "VPN & Lab 7", "question": "ใน Lab 7-B คำสั่ง `tcpdump -n -A -i eth1` พารามิเตอร์ `-n` และ `-A` ทำหน้าที่อย่างไร?", "choices": {"A": "จำกัดการจับข้อมูลไม่เกิน 100 ไบต์ และส่งข้อมูลออกทางหน้าต่างแจ้งเตือน", "B": "นับจำนวนแพ็กเก็ตทั้งหมด และบันทึกข้อมูลแบบไม่ระบุตัวตนของผู้ใช้งาน", "C": "กรองจับเฉพาะแพ็กเก็ต ARP และปิดการทำงานของอินเทอร์เฟซทันทีที่เสร็จ", "D": "ไม่แปลงไอพีเป็นชื่อโฮสต์ และแสดงเนื้อหาเพย์โหลดเป็นตัวอักษร ASCII"}, "answer": "D", "explanation": "`-n` ปิดการแปลง IP/Port เป็นชื่อโฮสต์ (ไม่ทำ Reverse DNS เพื่อความเร็ว) และ `-A` แสดงผลลัพธ์เป็นตัวอักษร ASCII"}, {"id": "q44", "category": "VPN & Lab 7", "question": "หากต้องการบันทึกข้อมูลแพ็กเก็ตดิบจาก tcpdump เป็นไฟล์ .pcap ไปเปิดดูด้วย Wireshark ต้องใช้ออปชันใด?", "choices": {"A": "-s Lab07B.pcap", "B": "-w Lab07B.pcap", "C": "-o Lab07B.pcap", "D": "-f Lab07B.pcap"}, "answer": "B", "explanation": "ออปชัน `-w <filename>` สั่งให้ tcpdump เขียนข้อมูลแพ็กเก็ตดิบลงไฟล์ pcap โดยตรงแทนการแสดงผลบนหน้าจอ"}, {"id": "q45", "category": "VPN & Lab 7", "question": "ในซอฟต์แวร์ OpenVPN ไดรเวอร์เน็ตเวิร์กเสมือนแบบ tun และ tap แตกต่างกันอย่างไร?", "choices": {"A": "tun ทำงานที่ Layer 3 (IP Tunnel) ส่วน tap ทำงานที่ Layer 2 (Ethernet Bridging)", "B": "tun รองรับเฉพาะสายไฟเบอร์ ส่วน tap รองรับเฉพาะการเชื่อมต่อผ่านคลื่นวิทยุไร้สาย", "C": "tun ต้องติดตั้งบนระบบวินโดวส์ ส่วน tap ต้องติดตั้งบนระบบปฏิบัติการลินุกซ์เท่านั้น", "D": "tun ใช้สำหรับการควบคุมระยะไกล ส่วน tap ใช้สำหรับการแชร์ไฟล์ข้อมูลในเครือข่าย"}, "answer": "A", "explanation": "`dev tun` ทำงานที่ Layer 3 (IP Routed Tunnel) ส่วน `dev tap` ทำงานที่ Layer 2 (Virtual Ethernet Adapter / Bridged Network)"}, {"id": "q46", "category": "Cloud Security & IAM", "question": "ข้อใดเป็นหนึ่งใน 5 คุณลักษณะจำเป็น (5 Essential Characteristics) ของคลาวด์ตาม NIST SP 800-145?", "choices": {"A": "Hypervisor virtualization", "B": "Public cloud deployment", "C": "Software as a Service", "D": "On-demand self-service"}, "answer": "D", "explanation": "5 คุณลักษณะของ NIST SP 800-145: 1. On-demand self-service, 2. Broad network access, 3. Resource pooling, 4. Rapid elasticity, 5. Measured service"}, {"id": "q47", "category": "Cloud Security & IAM", "question": "ตามโมเดล Shared Responsibility ของคลาวด์แบบ IaaS สิ่งใดที่อยู่ในความรับผิดชอบของลูกค้า (Customer)?", "choices": {"A": "การจัดการระบบจ่ายไฟสำรองและเครื่องกำเนิดไฟฟ้าดีเซลเพื่อป้องกันไฟดับของระบบ", "B": "การบำรุงรักษาเครื่องเซิร์ฟเวอร์กายภาพและระบบทำความเย็นภายในอาคารดาต้าเซ็นเตอร์", "C": "การอัปเดตเฟิร์มแวร์ของสวิตช์และเราเตอร์หลักทางกายภาพของผู้ให้บริการคลาวด์", "D": "ระบบปฏิบัติการ แอปพลิเคชัน ข้อมูล และการตั้งค่าไฟร์วอลล์ของระบบเครือข่ายเสมือน"}, "answer": "D", "explanation": "ใน IaaS ผู้ให้บริการคลาวด์ดูแล Physical Facilities & Hardware ส่วนลูกค้าต้องดูแล Guest OS, Patches, Apps, Data และ Security Config"}, {"id": "q48", "category": "Cloud Security & IAM", "question": "ในเอกสาร AWS IAM Policy แบบ JSON คีย์ใดที่ใช้กำหนดว่าอนุญาตหรือปฏิเสธสิทธิ์การกระทำ?", "choices": {"A": "Resource", "B": "Action", "C": "Effect", "D": "Principal"}, "answer": "C", "explanation": "คีย์ `Effect` มีค่าเป็น `\"Allow\"` หรือ `\"Deny\"` เพื่อระบุว่าจะให้สิทธิ์หรือตัดสิทธิ์ในคำขอนั้น"}, {"id": "q49", "category": "Cloud Security & IAM", "question": "ในระบบประเมินสิทธิ์ IAM หากมีนโยบายหนึ่งระบุ Allow และอีกนโยบายหนึ่งระบุ Deny ผลลัพธ์จะเป็นอย่างไร?", "choices": {"A": "Allow จะมีผลเหนือกว่าเสมอตามหลักความสะดวกในการใช้งาน", "B": "Explicit Deny จะมีผลเด็ดขาดและปฏิเสธคำขอการเข้าถึงทันที", "C": "ระบบจะเลือกใช้นโยบายที่ถูกบันทึกล่าสุดลงในฐานข้อมูล", "D": "ระบบจะแจ้งเตือนข้อผิดพลาดและส่งคำขอไปยังผู้ดูแลระบบ"}, "answer": "B", "explanation": "ตามหลัก IAM Evaluation Logic: Explicit Deny overrides Allow เสมอ หากมีนโยบายสั่ง Deny แม้แต่ข้อเดียว การเข้าถึงจะถูกตัดสิทธิ์ทันที"}, {"id": "q50", "category": "Cloud Security & IAM", "question": "ความแตกต่างสำคัญระหว่างกระบวนการ Authentication และ Authorization คือข้อใด?", "choices": {"A": "Authentication ยืนยันตัวตนผู้ใช้ ส่วน Authorization ตรวจสอบสิทธิ์ในการเข้าถึงทรัพยากร", "B": "Authentication ตรวจสอบสิทธิ์การใช้งาน ส่วน Authorization ตรวจสอบความถูกต้องของรหัสผ่าน", "C": "Authentication ทำงานบนเว็บเบราว์เซอร์ ส่วน Authorization ทำงานบนแอปพลิเคชันมือถือ", "D": "Authentication ใช้งานในเวลากลางวัน ส่วน Authorization ใช้งานในเวลากลางคืนเท่านั้น"}, "answer": "A", "explanation": "Authentication = การพิสูจน์ยืนยันตัวตน (Who you are) ส่วน Authorization = การกำหนดและตรวจสอบสิทธิ์ว่าทำอะไรได้บ้าง (What permissions you have)"}];
+
+    let activeCategory = 'all';
+    let filteredList = [...ALL_QUESTIONS];
+    let currentIndex = 0;
+    let userAnswers = {};
+    let showMistakesOnly = false;
+
+    function formatText(t) {
+      if (!t) return '';
+      let s = t
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-black/40 border border-white/10 text-emerald-300 font-mono text-xs">$1</code>')
+        .replace(/\*\*([^\*]+)\*\*/g, '<strong class="text-[var(--foreground)] font-semibold">$1</strong>');
+      return s;
+    }
+
+    function init() {
+      filterCategory('all');
+      document.addEventListener('keydown', handleKeyNav);
+    }
+
+    function filterCategory(cat) {
+      activeCategory = cat;
+      showMistakesOnly = false;
+      const fBtn = document.getElementById('btn-filter-mistake');
+      if (fBtn) fBtn.classList.remove('bg-rose-500/20', 'text-rose-400', 'border-rose-500');
+
+      document.querySelectorAll('.cat-tab').forEach(b => {
+        b.className = 'cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--card)] text-[var(--muted-foreground)] border-[var(--border)] hover:text-[var(--foreground)]';
+      });
+
+      const tabMap = {
+        'all': 'tab-all',
+        'Malware & Countermeasures': 'tab-malware',
+        'DoS/DDoS & Lab 4': 'tab-dos',
+        'Cyber Attacks & Scanning Lab 3': 'tab-scan',
+        'IDPS & Lab 5': 'tab-idps',
+        'Firewall & Lab 6': 'tab-fw',
+        'Security Testing NIST SP 800-115': 'tab-test',
+        'VPN & Lab 7': 'tab-vpn',
+        'Cloud Security & IAM': 'tab-cloud'
+      };
+
+      const activeBtn = document.getElementById(tabMap[cat] || 'tab-all');
+      if (activeBtn) {
+        activeBtn.className = 'cat-tab px-3 py-2 rounded-xl border font-medium whitespace-nowrap transition bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm';
+      }
+
+      applyFilters();
+      currentIndex = 0;
+      renderCurrent();
+      renderPalette();
+      updateStats();
+    }
+
+    function toggleMistakes() {
+      showMistakesOnly = !showMistakesOnly;
+      const fBtn = document.getElementById('btn-filter-mistake');
+      if (showMistakesOnly) {
+        fBtn.classList.add('bg-rose-500/20', 'text-rose-400', 'border-rose-500');
+      } else {
+        fBtn.classList.remove('bg-rose-500/20', 'text-rose-400', 'border-rose-500');
+      }
+      applyFilters();
+      currentIndex = 0;
+      renderCurrent();
+      renderPalette();
+    }
+
+    function applyFilters() {
+      let res = (activeCategory === 'all')
+        ? [...ALL_QUESTIONS]
+        : ALL_QUESTIONS.filter(q => q.category === activeCategory);
+
+      if (showMistakesOnly) {
+        res = res.filter(q => userAnswers[q.id] && !userAnswers[q.id].isCorrect);
+        if (res.length === 0) {
+          alert('ไม่พบข้อที่ตอบผิดในหมวดนี้ 🎉');
+          showMistakesOnly = false;
+          const fBtn = document.getElementById('btn-filter-mistake');
+          if (fBtn) fBtn.classList.remove('bg-rose-500/20', 'text-rose-400', 'border-rose-500');
+          res = (activeCategory === 'all') ? [...ALL_QUESTIONS] : ALL_QUESTIONS.filter(q => q.category === activeCategory);
+        }
+      }
+      filteredList = res;
+    }
+
+    function renderCurrent() {
+      if (filteredList.length === 0) return;
+      if (currentIndex >= filteredList.length) currentIndex = filteredList.length - 1;
+      if (currentIndex < 0) currentIndex = 0;
+
+      const q = filteredList[currentIndex];
+      document.getElementById('q-badge-category').textContent = q.category;
+      document.getElementById('q-counter').textContent = `ข้อที่ ${currentIndex + 1} / ${filteredList.length}`;
+      document.getElementById('question-text').innerHTML = formatText(q.question);
+
+      const container = document.getElementById('choices-container');
+      container.innerHTML = '';
+
+      const ans = userAnswers[q.id];
+
+      ['A', 'B', 'C', 'D'].forEach(letter => {
+        const btn = document.createElement('button');
+        let style = 'bg-[var(--card)] hover:bg-[var(--background)] border-[var(--border)] hover:border-blue-400 text-[var(--foreground)] cursor-pointer';
+        let badgeStyle = 'bg-[var(--background)] text-[var(--muted-foreground)]';
+
+        if (ans) {
+          btn.disabled = true;
+          if (letter === q.answer) {
+            style = 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-semibold ring-1 ring-emerald-500 cursor-default';
+            badgeStyle = 'bg-emerald-500 text-black border-emerald-500';
+          } else if (ans.selected === letter) {
+            style = 'bg-rose-500/20 border-rose-500 text-rose-400 font-semibold cursor-default';
+            badgeStyle = 'bg-rose-500 text-white border-rose-500';
+          } else {
+            style = 'bg-[var(--card)] border-[var(--border)] opacity-40 text-[var(--muted-foreground)] cursor-default';
+          }
+        }
+
+        btn.className = `w-full text-left p-3.5 md:p-4 rounded-xl border transition-all flex items-start gap-3 group ${style}`;
+        btn.onclick = () => selectChoice(letter);
+        btn.innerHTML = `
+          <span class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs uppercase border border-current ${badgeStyle}">
+            ${letter}
+          </span>
+          <span class="text-xs md:text-sm leading-relaxed pt-0.5">
+            ${formatText(q.choices[letter] || '')}
+          </span>
+        `;
+        container.appendChild(btn);
+      });
+
+      const expBox = document.getElementById('explanation-box');
+      const statusEl = document.getElementById('feedback-status');
+      const expContent = document.getElementById('explanation-content');
+
+      if (ans) {
+        expBox.classList.remove('hidden');
+        if (ans.isCorrect) {
+          expBox.className = 'rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 p-4 md:p-5 space-y-2';
+          statusEl.innerHTML = `
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 text-black text-xs font-black">✓</span>
+            <span class="text-emerald-400 font-bold">ถูกต้อง! ยอดเยี่ยมมาก</span>
+          `;
+        } else {
+          expBox.className = 'rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-300 p-4 md:p-5 space-y-2';
+          statusEl.innerHTML = `
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-500 text-white text-xs font-black">✕</span>
+            <span class="text-rose-400 font-bold">ยังไม่ถูกต้อง! (คำตอบที่ถูกต้องคือข้อ ${q.answer})</span>
+          `;
+        }
+        expContent.innerHTML = `
+          <div><strong class="text-[var(--foreground)] font-semibold">เฉลยข้อ:</strong> <span class="font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">${q.answer}</span></div>
+          <div class="pt-1 text-[var(--foreground)]/90 font-normal">${formatText(q.explanation)}</div>
+        `;
+      } else {
+        expBox.classList.add('hidden');
+      }
+
+      document.getElementById('btn-prev').disabled = (currentIndex === 0);
+      document.getElementById('btn-next').disabled = (currentIndex === filteredList.length - 1);
+
+      renderPalette();
+    }
+
+    function selectChoice(letter) {
+      const q = filteredList[currentIndex];
+      if (userAnswers[q.id]) return;
+      userAnswers[q.id] = { selected: letter, isCorrect: (letter === q.answer) };
+      updateStats();
+      renderCurrent();
+    }
+
+    function retryCurrent() {
+      const q = filteredList[currentIndex];
+      delete userAnswers[q.id];
+      updateStats();
+      renderCurrent();
+    }
+
+    function resetAll() {
+      if (confirm('คุณต้องการรีเซ็ตคำตอบทั้งหมดใช่หรือไม่?')) {
+        userAnswers = {};
+        updateStats();
+        renderCurrent();
+        renderPalette();
+      }
+    }
+
+    function shuffleCurrent() {
+      for (let i = filteredList.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredList[i], filteredList[j]] = [filteredList[j], filteredList[i]];
+      }
+      currentIndex = 0;
+      renderCurrent();
+      renderPalette();
+    }
+
+    function prevQ() { if (currentIndex > 0) { currentIndex--; renderCurrent(); } }
+    function nextQ() { if (currentIndex < filteredList.length - 1) { currentIndex++; renderCurrent(); } }
+    function jumpTo(i) { currentIndex = i; renderCurrent(); }
+
+    function renderPalette() {
+      const grid = document.getElementById('palette-grid');
+      grid.innerHTML = '';
+      let answered = 0;
+
+      filteredList.forEach((q, i) => {
+        const btn = document.createElement('button');
+        const ans = userAnswers[q.id];
+        const isCurrent = (i === currentIndex);
+
+        let c = 'bg-[var(--background)] text-[var(--muted-foreground)] border-[var(--border)]';
+        if (ans) {
+          answered++;
+          c = ans.isCorrect
+            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500 font-semibold'
+            : 'bg-rose-500/20 text-rose-400 border-rose-500 font-semibold';
+        }
+        if (isCurrent) {
+          c += ' ring-2 ring-blue-500 border-blue-500 scale-105 z-10';
+        }
+
+        btn.className = `h-9 rounded-xl border text-xs flex items-center justify-center transition-all ${c}`;
+        btn.textContent = i + 1;
+        btn.onclick = () => jumpTo(i);
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('palette-progress').textContent = `${answered}/${filteredList.length}`;
+      const pct = filteredList.length > 0 ? (answered / filteredList.length) * 100 : 0;
+      document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+    }
+
+    function updateStats() {
+      let c = 0, w = 0;
+      Object.values(userAnswers).forEach(a => {
+        if (a.isCorrect) c++;
+        else w++;
+      });
+      const t = c + w;
+      document.getElementById('stat-correct').textContent = c;
+      document.getElementById('stat-wrong').textContent = w;
+      document.getElementById('stat-accuracy').textContent = (t > 0 ? Math.round((c / t) * 100) : 0) + '%';
+    }
+
+    function handleKeyNav(e) {
+      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+      const k = e.key.toUpperCase();
+      if (['A', 'B', 'C', 'D'].includes(k)) selectChoice(k);
+      else if (k === 'ARROWLEFT') prevQ();
+      else if (k === 'ARROWRIGHT') nextQ();
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

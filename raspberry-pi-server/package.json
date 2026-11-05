@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "tunnel": "ssh -t -R 80:localhost:3000 proxy.tunnl.gg",
+    "tunnel:stable": "ssh -t -R 80:localhost:3000 stable@proxy.tunnl.gg"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",

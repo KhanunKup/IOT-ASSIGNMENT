@@ -41,6 +41,10 @@ export function mountApiRoutes(app: Express): void {
       mcpEndpoints: {
         sse: `/sse`,
         httpJsonRpc: `/mcp`,
+        tunnl: {
+          randomUrlCommand: `ssh -t -R 80:localhost:${CONFIG.port} proxy.tunnl.gg`,
+          stableUrlCommand: `ssh -t -R 80:localhost:${CONFIG.port} stable@proxy.tunnl.gg`,
+        },
       },
     });
   });
